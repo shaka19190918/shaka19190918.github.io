@@ -1,14 +1,23 @@
-# 小学一年级数学 · 3D知识点星球
+# 学习工具站
 
-🌐 在线访问：**https://shaka19190918.github.io/**
+🌐 **https://shaka19190918.github.io/**
 
-基于**国家中小学智慧教育平台**官方教材目录（人教版 2024 新教材）构建的一年级数学知识图谱。
+## 工具目录
+
+| 工具 | 地址 | 说明 |
+| --- | --- | --- |
+| 🧩 幼小衔接快乐营 | `https://shaka19190918.github.io/youxiao-xianjie/` | 独立仓库 [youxiao-xianjie](https://github.com/shaka19190918/youxiao-xianjie) |
+| 🔢 一年级数学 3D 知识点星球 | `https://shaka19190918.github.io/zzxiaoxue/` | 本仓库 `zzxiaoxue/` 目录 |
+
+## 一年级数学 · 3D知识点星球
+
+基于**国家中小学智慧教育平台**官方教材目录（人教版 2024 新教材）构建。
 
 - 上册 42 课时 + 下册 37 课时 = **79 个课节节点**
 - 每个节点都是一个 3D 星球，**点击直达**国家平台对应课时讲解页
 - 纯 CSS 3D + 原生 JS，**零外部依赖**，支持 iPad / 手机 / 桌面
 
-## 交互
+### 交互
 
 | 操作 | 效果 |
 | --- | --- |
@@ -17,8 +26,8 @@
 | 双击 / 双指轻点两下 | 复位视角 |
 | 右侧导航 | 按册次 → 单元 → 课时展开，点击直达 |
 
-## 数据来源
+### 数据来源
 
-教材目录与课时资源均来自国家中小学智慧教育平台（basic.smartedu.cn）
+教材目录与课时资源来自国家中小学智慧教育平台（basic.smartedu.cn）
 小学 / 数学 / 人教版 / 一年级，课时链接格式：
 `https://basic.smartedu.cn/syncClassroom/classActivity?activityId=…&chapterId=…&teachingmaterialId=…&fromPrepare=1`

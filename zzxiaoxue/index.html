@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小学一年级数学 · 3D知识点星球（人教版2024）</title>
+    <meta name="description" content="小学一年级数学（人教版2024新教材）上下册 79 个课时的 3D 知识图谱，点击任一课节星球直达国家中小学智慧教育平台对应课时讲解。">
+    <meta name="theme-color" content="#0a1020">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="一年级数学3D">
+    <meta property="og:title" content="小学一年级数学 · 3D知识点星球">
+    <meta property="og:description" content="79 个课时 · 点击直达国家中小学智慧教育平台">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230a1020'/%3E%3Ccircle cx='22' cy='26' r='11' fill='%23ff9a2e'/%3E%3Ccircle cx='44' cy='40' r='9' fill='%2335bcec'/%3E%3Ccircle cx='41' cy='19' r='5' fill='%23f5cf1f'/%3E%3Ccircle cx='20' cy='47' r='4' fill='%2384d944'/%3E%3C/svg%3E">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; overflow: hidden; background: radial-gradient(ellipse at center, #16233f 0%, #0a1020 55%, #05080f 100%); font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; }
+        body { user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+        #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* 3D 舞台 */
+        #stage { position: fixed; inset: 0; z-index: 1; perspective: 1500px; cursor: grab; touch-action: none; }
+        #stage.dragging { cursor: grabbing; }
+        #scene { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
+        .sphere { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+        #sphereA { transform: translate3d(-300px, 0, 0); }
+        #sphereB { transform: translate3d(300px, 0, 0); }
+        .spin { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+
+        /* 轨道 */
+        .ring { position: absolute; left: -170px; top: -170px; width: 340px; height: 340px; border-radius: 50%; border: 1.5px dashed rgba(130,175,255,.22); }
+        .ring.r1 { transform: rotateX(78deg); }
+        .ring.r2 { transform: rotateY(76deg) rotateZ(24deg); }
+        .ring.r3 { transform: rotateZ(88deg) rotateX(80deg); }
+
+        /* 中心核心（区分上下册） */
+        .core { position: absolute; left: -34px; top: -34px; width: 68px; height: 68px; border-radius: 50%; filter: blur(1px); }
+        #sphereA .core { background: radial-gradient(circle at 35% 32%, #ffd9a0, #ff7a3c 55%, #c33c00); box-shadow: 0 0 45px rgba(255,140,60,.65), 0 0 90px rgba(255,100,30,.35); }
+        #sphereB .core { background: radial-gradient(circle at 35% 32%, #c7f0ff, #35a8e8 55%, #0a5f9e); box-shadow: 0 0 45px rgba(60,170,255,.65), 0 0 90px rgba(30,120,255,.35); }
+
+        /* 课节节点 */
+        .node { position: absolute; left: 0; top: 0; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; transform-style: preserve-3d; cursor: pointer; transition: box-shadow .15s; }
+        .node .ball { position: absolute; inset: 0; border-radius: 50%; box-shadow: inset -3px -4px 8px rgba(0,0,0,.5), inset 2px 3px 6px rgba(255,255,255,.6), 0 3px 8px rgba(0,0,0,.5); }
+        .node .ball::after { content: ""; position: absolute; top: 12%; left: 20%; width: 32%; height: 24%; border-radius: 50%; background: rgba(255,255,255,.8); filter: blur(1.5px); transform: rotate(-25deg); }
+        .node:hover { z-index: 999; }
+        .node:hover .ball { box-shadow: 0 0 0 3px rgba(255,255,255,.9), 0 0 22px rgba(255,255,255,.85), inset -3px -4px 8px rgba(0,0,0,.5); }
+
+        /* 直接显示的课名标签（billboard：始终正对屏幕，按深度淡出） */
+        .node .label {
+            position: absolute; left: 50%; top: 100%;
+            transform: translateX(-50%);
+            transform-origin: 50% 0;
+            margin-top: 4px;
+            max-width: 132px;
+            padding: 1px 6px;
+            border-radius: 8px;
+            background: rgba(6, 13, 30, .82);
+            border: 1px solid rgba(140, 185, 255, .26);
+            color: #e2ecff;
+            font-size: 10.5px;
+            line-height: 1.35;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+            box-shadow: 0 1px 5px rgba(0,0,0,.4);
+            letter-spacing: .3px;
+            opacity: 0;
+            transition: color .12s, border-color .12s, background .12s;
+        }
+        .node:hover .label { color: #ffd24a; border-color: rgba(255,210,74,.5); background: rgba(20, 30, 56, .92); }
+
+        .c0 .ball { background: radial-gradient(circle at 33% 30%, #ffb3a6, #ff5a4e 60%, #b3162f); }
+        .c1 .ball { background: radial-gradient(circle at 33% 30%, #ffd9a0, #ff9a2e 60%, #c65a00); }
+        .c2 .ball { background: radial-gradient(circle at 33% 30%, #fff5b8, #f5cf1f 60%, #b3890a); }
+        .c3 .ball { background: radial-gradient(circle at 33% 30%, #d6ffb8, #84d944 60%, #3f8f1c); }
+        .c4 .ball { background: radial-gradient(circle at 33% 30%, #a8f7dd, #1fc9a2 60%, #087e63); }
+        .c5 .ball { background: radial-gradient(circle at 33% 30%, #a8e8ff, #35bcec 60%, #0b6fa8); }
+        .c6 .ball { background: radial-gradient(circle at 33% 30%, #c2cbff, #6270f5 60%, #2a38bd); }
+        .c7 .ball { background: radial-gradient(circle at 33% 30%, #ecc4ff, #ab5fee 60%, #6023ad); }
+
+        /* HUD */
+        #hud { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 5; text-align: center; pointer-events: none; }
+        #hud h1 { font-size: 23px; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 14px rgba(90,150,255,.55); }
+        #hud .sub { margin-top: 5px; font-size: 12px; color: rgba(255,255,255,.7); }
+        #hud .sub b { color: #ffd24a; }
+        #hint { display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 20px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); color: rgba(255,255,255,.85); font-size: 12px; }
+
+        /* 球标识 */
+        .volTag { position: fixed; z-index: 4; font-size: 15px; color: #fff; letter-spacing: 2px; text-shadow: 0 2px 10px rgba(0,0,0,.7); pointer-events: none; opacity: .95; transform: translate(-50%, 0); white-space: nowrap; }
+        .volTag span { display: block; font-size: 11px; color: rgba(255,255,255,.6); letter-spacing: 1px; margin-top: 3px; }
+
+        /* tooltip */
+        #tooltip { position: fixed; z-index: 9; max-width: 300px; padding: 9px 13px; border-radius: 10px; background: rgba(8,15,32,.95); border: 1px solid rgba(120,170,255,.5); color: #fff; font-size: 13px; line-height: 1.6; box-shadow: 0 8px 28px rgba(0,0,0,.6); opacity: 0; pointer-events: none; transition: opacity .12s; }
+        #tooltip .t-name { font-size: 14px; font-weight: bold; color: #ffd24a; }
+        #tooltip .t-unit { color: rgba(255,255,255,.72); font-size: 12px; }
+        #tooltip .t-go { margin-top: 3px; color: #6fb4ff; font-size: 11px; }
+
+        /* 图例 */
+        #legend { position: fixed; right: 0; top: 0; bottom: 0; z-index: 5; width: 268px; padding: 14px 10px 14px 14px; background: rgba(255,255,255,.06); border-left: 1px solid rgba(255,255,255,.13); backdrop-filter: blur(8px); display: flex; flex-direction: column; }
+        #legend h3 { color: #fff; font-size: 13px; letter-spacing: 2px; margin-bottom: 8px; }
+        #legendBody { flex: 1; overflow-y: auto; padding-right: 6px; }
+        #legendBody::-webkit-scrollbar { width: 5px; }
+        #legendBody::-webkit-scrollbar-thumb { background: rgba(255,255,255,.22); border-radius: 3px; }
+        .lg-vol { margin: 10px 0 4px; font-size: 12px; font-weight: bold; color: #ffd24a; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,.14); padding-bottom: 4px; }
+        .lg-unit { display: flex; align-items: center; gap: 7px; padding: 5px 6px; margin: 2px 0; border-radius: 6px; color: rgba(255,255,255,.92); font-size: 12px; cursor: pointer; }
+        .lg-unit:hover { background: rgba(255,255,255,.12); }
+        .lg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .lg-caret { margin-left: auto; font-size: 10px; color: rgba(255,255,255,.5); transition: transform .18s; }
+        .lg-lessons { display: none; margin: 2px 0 6px 18px; }
+        .lg-lessons.open { display: block; }
+        .lg-lesson { padding: 4px 8px; margin: 1px 0; border-radius: 5px; font-size: 12px; color: rgba(255,255,255,.75); cursor: pointer; line-height: 1.4; }
+        .lg-lesson:hover { background: rgba(120,180,255,.22); color: #fff; }
+
+        /* 来源 */
+        #src { position: fixed; left: 14px; bottom: 12px; z-index: 5; max-width: 300px; padding: 9px 12px; border-radius: 9px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.62); font-size: 11px; line-height: 1.65; }
+        #src a { color: #7cc0ff; text-decoration: none; }
+
+        /* ============ 响应式：iPad 横屏 / 竖屏 / 手机 ============ */
+        /* 窄一点时图例栏收窄，把宽度让给 3D 舞台 */
+        @media (max-width: 1280px) {
+            #legend { width: 216px; padding: 12px 8px 12px 11px; }
+            #legend h3 { font-size: 12px; }
+            .lg-unit, .lg-lesson { font-size: 11.5px; }
+        }
+        /* 竖屏 / 小屏：隐藏侧栏与来源，全屏给 3D */
+        @media (max-width: 860px) {
+            #legend { display: none; }
+            #src { display: none; }
+            #hud h1 { font-size: 18px; }
+            #hud .sub { font-size: 11px; }
+        }
+        /* 横屏高度不足（iPad 横屏 768/810/820）时压缩 HUD */
+        @media (max-height: 700px) {
+            #hud { top: 8px; }
+            #hud h1 { font-size: 18px; letter-spacing: 1px; }
+            #hud .sub { margin-top: 3px; font-size: 11px; }
+            #hint { margin-top: 5px; padding: 3px 10px; font-size: 11px; }
+            .volTag { font-size: 13px; }
+            .volTag span { font-size: 10px; }
+        }
+        /* 触屏（iPad / 手机）：放大点击热区、关闭 hover 依赖 */
+        @media (pointer: coarse) {
+            .node::before { content: ""; position: absolute; inset: -12px; border-radius: 50%; }
+            .node .label { font-size: 11px; max-width: 128px; }
+            #legendBody { -webkit-overflow-scrolling: touch; }
+            .lg-lesson { padding: 7px 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+    <div id="stage">
+        <div id="scene">
+            <div class="sphere" id="sphereA"><div class="spin" id="spinA"></div></div>
+            <div class="sphere" id="sphereB"><div class="spin" id="spinB"></div></div>
+        </div>
+    </div>
+
+    <div id="hud">
+        <h1>小学一年级数学 · 3D知识点星球</h1>
+        <div class="sub">人教版（2024新教材）· 一年级 上 / 下册 &nbsp;|&nbsp; 共 <b id="cnt">0</b> 个课时 &nbsp;|&nbsp; 点击<b>星球</b>直达国家平台对应课时讲解</div>
+        <div id="hint">✋ 单指拖动旋转 · 双击/双点复位 · 点击课节星球直达国家平台对应课时讲解</div>
+    </div>
+
+    <div class="volTag" id="tagA">一年级 · 上册<span id="cntA">0 课时</span></div>
+    <div class="volTag" id="tagB">一年级 · 下册<span id="cntB">0 课时</span></div>
+
+    <div id="tooltip"></div>
+
+    <aside id="legend">
+        <h3>📚 课时导航（点击展开）</h3>
+        <div id="legendBody"></div>
+    </aside>
+
+    <div id="src">
+        📖 教材来源：<a href="https://basic.smartedu.cn/syncClassroom/prepare?defaultTag=e7bbb2de-0590-11ed-9c79-92fc3b3249d5%2Fe7bbcf80-0590-11ed-9c79-92fc3b3249d5%2Fff8080814371757b01437c363a187b0a%2Fe7bbd296-0590-11ed-9c79-92fc3b3249d5%2Fff8080814371757b014390f883db0453%2F5136342961" target="_blank" rel="noopener">国家中小学智慧教育平台 · 小学/数学/人教版/一年级</a><br>
+        ✅ 每个星球已精确链接到平台上对应的课时页面。
+    </div>
+
+<script>
+var KNOWLEDGE = [{"name":"在校园里找一找","unit":"数学游戏","vol":"A","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a817b06d-5d49-e59f-1bff-354e28f85d6e&chapterId=2524deea-316d-4978-85a3-fdaac5ac3c6b&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"在操场上玩一玩","unit":"数学游戏","vol":"A","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f4ef48f1-2f0b-60e2-f3f8-fca9877dca02&chapterId=0ec44b98-caf0-499b-903a-7724fc21032f&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"在教室里认一认","unit":"数学游戏","vol":"A","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=b0b7e9fe-ec7f-39be-52e2-420b03c1aa8f&chapterId=27ef31a3-a3a4-475c-b5ce-ea8abff9a1a4&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"在教室里玩一玩","unit":"数学游戏","vol":"A","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=ac17e8bb-f3f7-7889-4aca-e61e3981131e&chapterId=c05e3de7-5ace-42dc-b192-71891ae3104e&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"学习准备","unit":"数学游戏","vol":"A","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=1f16d287-aefe-9b32-62c5-c39908911df4&chapterId=a4706af0-8324-44ae-b1db-c8be2a38fb3e&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"1～5的认识","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=fa3a9a7c-9085-519a-e9cb-4c8c1f3761dc&chapterId=45a1c85b-4c52-47c6-920d-c485f21bb8ad&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"比大小","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f348c8fc-a857-c352-eff7-fab9d6ef1220&chapterId=32aff930-d2cb-475f-8263-acf853fd4edf&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"第几","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d2745ed6-8864-3057-730f-a6eba6c195ce&chapterId=803c9ac0-d35c-47a6-9a86-019581b8f4f7&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"分与合","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=67c1abcf-6491-9cc7-f60c-5d59b15d5584&chapterId=2a0eae67-3639-46ec-abde-d3f879f88245&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"1～5的加、减法（加法）","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=b6453fac-23c2-234a-a5a2-9331715f1d62&chapterId=21fab431-9322-4bb0-aee8-1c4ad644bf55&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"1～5的加、减法（减法）","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=acd20a51-99e5-4353-1aae-593666583be8&chapterId=0da8a119-4bc0-48c7-9fd7-9dc8c1c1fd34&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"0的认识和加、减法","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a140e076-0d3d-2aa1-af4b-c5813cc03daa&chapterId=43bbcbb2-3898-444e-9da5-5302124adc63&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"整理和复习","unit":"一  5以内数的认识和加、减法","vol":"A","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c9c99c96-6705-657f-b16e-168ccb0ca099&chapterId=5cd47ba3-5d21-48a1-9fc8-a41358ecc4bd&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"6～9的认识","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=179006a9-05e3-4549-31ff-15b176050f6d&chapterId=63374f0f-4b61-4489-ae3c-d728e7f84f99&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"6、7的组成","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f72b75e0-613b-fb2b-3742-42dc27855511&chapterId=32da27ea-76e9-420c-8d9c-bc63f6590246&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"8、9的组成","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7d8dea36-674b-5a17-fd58-75852abb2226&chapterId=845af17e-41c3-4830-b711-f7bd69cdb38a&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"6和7的加、减法","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c7ae2fa4-bf3c-37e5-d361-56797379f516&chapterId=07815274-f506-4b4a-a372-f97c9551a2a1&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"用加法解决问题","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=735832c1-f295-1044-5fcf-02c306508bf5&chapterId=4e9300c7-f642-4e63-9dbc-831f387b0d0f&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"用减法解决问题","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c59c69f5-3dbb-27f2-a16c-d0ac80eea596&chapterId=49834875-9cd9-43ba-a6b6-31bedc3aaf02&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"8和9的加、减法","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=3f32674a-10bd-7a85-d5fa-51c2213a8608&chapterId=df1f642c-3951-4b8c-a7fb-f82c4079e7b2&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"用加、减法解决问题","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=1abfb058-1d89-2c76-5f60-7caac9feabc9&chapterId=ca0002bc-3bc7-4bef-97b4-15f388bcd08c&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"10的认识","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=8a281c2d-a1f5-0d76-a939-8cbeb80f89c0&chapterId=025eb1c5-b5cc-483d-ac4f-a192a75451c0&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"10的加、减法","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f7236e0d-f009-ef88-dabe-c7c524f02803&chapterId=c498aca2-280e-4e41-a6d3-bd50d3da7b9a&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"连加、连减  加、减混合","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c947da10-5804-f38f-48f6-601310ed421d&chapterId=630133ba-c675-4e97-b6de-7d8d11289fc9&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"二  6～10的认识和加、 减法 整理和复习","unit":"二  6～10的认识和加、 减法","vol":"A","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f699e3cb-294c-fc75-6579-2582ce0d43ca&chapterId=fdeead26-c1bc-4602-969c-fc1fcb341008&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"认识立体图形","unit":"三  认识立体图形","vol":"A","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=4a0b4e6f-48d6-6653-351a-e295bb64b8fe&chapterId=dbffad54-ac1d-461e-beb5-b2384e0fa680&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"三  认识立体图形 解决问题","unit":"三  认识立体图形","vol":"A","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a8708e32-e30f-3112-6895-ad7a521aed13&chapterId=33886039-c4f2-41f5-9bd3-6daf9547184a&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"拼一拼","unit":"三  认识立体图形","vol":"A","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c72fb937-0099-5585-88e6-a0981da97831&chapterId=b91ba558-d66a-47c5-809a-2843ef6e3f20&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"10的再认识","unit":"四 11～ 20的认识","vol":"A","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=283c50dc-d518-e5a4-ae17-b4c37df65186&chapterId=7415785b-3fd8-495f-81e7-81bcdb327c0a&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"11～20 的认识","unit":"四 11～ 20的认识","vol":"A","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=359c7317-335c-2f30-a5bc-6f6b71e3a172&chapterId=a3322c42-147e-4ccd-80a0-3d1b3e341428&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"简单加、减法","unit":"四 11～ 20的认识","vol":"A","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f79b6ffa-a492-c96a-5cfa-e75d5021989e&chapterId=4868b198-14ac-4f85-8e55-ccaaef49f888&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"四 11～ 20的认识 解决问题","unit":"四 11～ 20的认识","vol":"A","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f385cfca-6868-a298-0fe4-63a319709359&chapterId=a6b85a1c-cfda-4627-9115-2aa6ab16ca69&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"四 11～ 20的认识 整理和复习","unit":"四 11～ 20的认识","vol":"A","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d11684eb-6c3c-4176-da66-017b51cf16cb&chapterId=ab5809e7-f2b5-4516-b035-dd54115ea0f9&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"9加几","unit":"五 20以内的进位加法","vol":"A","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=5eb2ceed-819e-0017-0e1c-bbb060b74c4b&chapterId=997f0de7-a128-44ee-b0cd-0a8f97887c1f&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"8、7、6 加几","unit":"五 20以内的进位加法","vol":"A","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=dce4f148-d4da-cc78-ce7c-10a841a3ac80&chapterId=761be111-be28-4b60-a16a-514a8dc22e2f&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"5、4、3、2 加几","unit":"五 20以内的进位加法","vol":"A","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=397ffa22-57f5-5c9e-f75a-69e95c2c73ce&chapterId=db848b0f-fc25-4806-bb02-f6b49226d0a3&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"解决问题","unit":"五 20以内的进位加法","vol":"A","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=112728c2-9042-3ae6-0d90-1c03db368f03&chapterId=35590aa5-150b-4b1c-a1d2-a83621299dd3&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"逆向用加法解决问题","unit":"五 20以内的进位加法","vol":"A","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=4805e566-03e2-8d8b-499c-5744d08e293b&chapterId=7f801c99-039e-42d2-adae-8bbb9558fd16&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"整理和复习","unit":"五 20以内的进位加法","vol":"A","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=d7643a2d-f204-5efb-0baf-0d203a35762d&chapterId=dcf4353d-bcb9-4774-9f43-f8c1924fa5c6&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"数与运算","unit":"六 复习与关联","vol":"A","cid":6,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=e48464f1-0169-32b4-ff40-a110b1ca88c6&chapterId=2eb14b17-e5f8-473d-95d3-05083e4960a5&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"数量关系","unit":"六 复习与关联","vol":"A","cid":6,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=138ff1c0-6ba0-a1c7-bb82-3f885e2f80ca&chapterId=7a3e2077-4227-49aa-9f0f-6d07aa1313ff&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"图形的认识","unit":"六 复习与关联","vol":"A","cid":6,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=e7c2de3c-b0c7-d058-61ed-f0cd1032f669&chapterId=204c0d91-5317-458b-86fc-6f0df3577f66&teachingmaterialId=ba9d9c0b-2c1c-4bba-84d7-369fb405bb13&fromPrepare=1"},{"name":"认识平面图形","unit":"一、认识平面图形","vol":"B","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=86bdd6c7-ad71-d131-1019-173a9ac88e76&chapterId=064c0399-e09b-462b-956f-f2165f0b3b54&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"图形的拼组","unit":"一、认识平面图形","vol":"B","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a0cc7c58-08ee-a303-9c6b-319ed1004377&chapterId=43c58aab-3f26-4ee6-b49d-29086a5ff85f&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"解决问题","unit":"一、认识平面图形","vol":"B","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=e52545f6-aab7-587e-731b-82235387a598&chapterId=ba08a10c-649d-41fd-9bfc-faca1497585f&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"整理和复习","unit":"一、认识平面图形","vol":"B","cid":0,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c6599a51-8d7b-31de-6eed-e7d22678175c&chapterId=59aa1e2b-5ed0-44f9-b420-e22573cada98&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"十几减9","unit":"二、20以内的退位减法","vol":"B","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=4a3fa8a5-dfa4-ead7-6f2e-a65ca29840c5&chapterId=ef1b990a-ea75-4d0a-a2ea-703a87c4e6b4&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"十几减8、7、6","unit":"二、20以内的退位减法","vol":"B","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=fcaa4a75-5a56-9dea-6db9-6c173b3ad168&chapterId=db87c960-19b1-4a11-9ed1-52af170c31fa&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"十几减5、4、3、2","unit":"二、20以内的退位减法","vol":"B","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=3bdb2177-6515-2e62-a6b8-b15b8a9c6ac9&chapterId=090d7805-fe17-41f0-8352-73c079fe6ac4&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"解决问题-求另一个加数的有多余条件的问题解决","unit":"二、20以内的退位减法","vol":"B","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=5c98d77d-9255-fca5-2335-c5e4882438f2&chapterId=f8a0cc09-7003-4abc-a346-aef8c7fc5223&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"整理和复习","unit":"二、20以内的退位减法","vol":"B","cid":1,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=0c2c7bd6-2068-0312-c903-67732615ffe7&chapterId=080af136-a527-42a5-8367-b6855c2b2935&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"数数、数的组成","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=5800cc87-943f-9517-e536-ea375588fa4f&chapterId=752c43ba-9465-4170-8d05-ec407c8e6ae8&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"读法和写法","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f329c604-4fdb-a2c1-400e-5448cde940db&chapterId=e0fe1ec3-dc6a-4da3-8f94-d868461a40c0&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"100的认识","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=a1f73b37-19f8-4d20-8c34-d8782fc00879&chapterId=0f10564d-e8e4-4b43-9c72-97cd8d16a341&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"数的顺序","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2dcdc27a-6ac2-09b7-fea8-218dab100586&chapterId=2f7b0931-670f-4664-af31-876f2693654e&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"比大小","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=e1c3ce66-ccd3-11f5-306d-d8b7585278fd&chapterId=ba1db695-94ad-4c0f-9faf-fff92c93f0b3&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"用“大得多” “大一些” 说一说","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=12c819ce-95f9-5075-9beb-0d97b66edcb1&chapterId=c0a1512b-d857-4b19-8aba-4f0bc17bb924&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"100以内简单的加、减法","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=e6f26aa6-80a3-ded7-bd04-e61a5282e916&chapterId=4e9dd59b-d90f-4bb8-8325-26888009fea8&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"摆一摆 想一想","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=c8fbe691-d399-63df-bdfd-71f21875704a&chapterId=a4be94a0-e10f-465f-bcd7-a2cbe1feeb5e&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"整理和复习","unit":"三、100以内数的认识","vol":"B","cid":2,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=57615bc9-aa05-9667-6fe2-565113c1d222&chapterId=7ea3da90-af66-4293-8fde-02c4e3f62fc6&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"口算加法-两位数加一位数和整十数（不进位）","unit":"四、100以内的口算加、减法","vol":"B","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2c31deaf-01fd-3df9-2d3b-258a91ab629a&chapterId=574798d6-d2cc-4b85-82c9-81c477081bc4&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"口算加法-两位数加一位数（进位）","unit":"四、100以内的口算加、减法","vol":"B","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2c8fe2e9-cb78-af6d-bbfd-32281f78b9dd&chapterId=8aa04122-1fbe-46b5-928c-55f28db3ce41&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"口算减法-两位数减一位数和整十数（不退位）","unit":"四、100以内的口算加、减法","vol":"B","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=76f1acd4-1865-08ef-90a2-8c3561d32249&chapterId=9823a8e5-a56c-45c8-9a93-7297fb92ee00&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"口算减法-两位数减一位数（退位）","unit":"四、100以内的口算加、减法","vol":"B","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7d9f2b10-050a-3f3a-38ef-8852a233d846&chapterId=fb5fd7b6-9672-482d-8e79-7e168894cc3c&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"用连减解决问题","unit":"四、100以内的口算加、减法","vol":"B","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=68689500-df5c-d883-311e-9ad39bef1c6e&chapterId=c701e49c-7639-485b-836e-7b89b07524b2&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"整理和复习","unit":"四、100以内的口算加、减法","vol":"B","cid":3,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=2288704a-be3b-6bf7-7ae2-a2a60f461bc5&chapterId=f760f10e-29b3-4677-bde4-621cfbe06702&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"笔算加法","unit":"五、100以内的笔算加、减法","vol":"B","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=766388da-630c-44bc-dbc4-c644f6eef097&chapterId=e4b610b5-b310-48f5-829c-965ba6e83264&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"笔算减法","unit":"五、100以内的笔算加、减法","vol":"B","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=7a1e2578-2993-8f1a-53fe-b6ccf1d90ebe&chapterId=45773dbd-7ba8-4925-807d-d560fb09ab8a&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"整理和复习","unit":"五、100以内的笔算加、减法","vol":"B","cid":4,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=05fdf449-90ce-826b-de47-49e0b59e9861&chapterId=846e5732-8c47-4cd9-b556-43ded0475a58&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"解决求两数相差几的实际问题","unit":"六、数量间的加减关系","vol":"B","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=78c27027-4dd1-8795-27ab-0aa24483193f&chapterId=64427552-7aab-4c06-b420-3264d18512fa&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"求比一个数多（或少）几的数是多少","unit":"六、数量间的加减关系","vol":"B","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=fc8b94a3-5a69-c42b-ea8e-ff4274f77f41&chapterId=d4e172c0-2755-4816-8684-2b1ccf656788&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"含相差数量关系的连续两问的问题","unit":"六、数量间的加减关系","vol":"B","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=f64695c0-e556-6393-c55a-e7c1775d2906&chapterId=38016e4f-ff5a-49b2-b3e7-b067846c7d6a&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"整理和复习","unit":"六、数量间的加减关系","vol":"B","cid":5,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=65e3dca1-14f7-70e2-0cba-2ef46ef20d03&chapterId=fae44590-aee0-44f3-a913-10128360d603&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"认识人民币-认一认、换一换","unit":"欢乐购物街","vol":"B","cid":6,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=fae1e2f3-6061-06f9-4984-269d404d79fb&chapterId=2a535411-8f67-4b89-abe2-626d93b3bb5a&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"买卖我做主","unit":"欢乐购物街","vol":"B","cid":6,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=aff5ef8d-5196-3d78-bd55-d17c2e8bab3e&chapterId=66072519-5aa1-49ce-b4fc-921bdbc6f6c0&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"小讲堂","unit":"欢乐购物街","vol":"B","cid":6,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=ee9a45b5-b72f-6d69-470c-6ac3f649c24f&chapterId=5171f545-27ad-41da-9a7c-19f941d1ebd3&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"数与运算","unit":"七、复习与关联","vol":"B","cid":7,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=65341bfd-219f-82c0-4f1c-76f0887b205c&chapterId=50b6d028-968b-449b-bd4c-f29b04919156&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"数量关系","unit":"七、复习与关联","vol":"B","cid":7,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=22f54a6b-8710-7589-0914-26c6b81b4b15&chapterId=609b84ce-34f1-42d6-9b70-872f882efdd3&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"},{"name":"图形的认识","unit":"七、复习与关联","vol":"B","cid":7,"url":"https://basic.smartedu.cn/syncClassroom/classActivity?activityId=45fe309f-367b-9374-7c6f-5768a517800c&chapterId=9a1947b2-0ff5-4b28-aa41-5d478a4d93a4&teachingmaterialId=b4dae36a-0d48-4149-820e-f532dad7607b&fromPrepare=1"}];
+
+/* 星空 */
+(function () {
+    var s = document.getElementById('stars'), h = '';
+    for (var i = 0; i < 100; i++) {
+        var sz = (Math.random() * 2 + 1).toFixed(1);
+        h += '<div style="position:absolute;left:' + (Math.random()*100).toFixed(2) + '%;top:' + (Math.random()*100).toFixed(2) + '%;width:' + sz + 'px;height:' + sz + 'px;border-radius:50%;background:rgba(255,255,255,' + (Math.random()*.5+.3).toFixed(2) + ');box-shadow:0 0 ' + (sz*2) + 'px rgba(180,210,255,.7);"></div>';
+    }
+    s.innerHTML = h;
+})();
+
+var R = 165;
+var GROUPS = { A: [], B: [] };
+KNOWLEDGE.forEach(function (k) { (GROUPS[k.vol] || (GROUPS[k.vol] = [])).push(k); });
+
+document.getElementById('cnt').textContent = KNOWLEDGE.length;
+document.getElementById('cntA').textContent = GROUPS.A.length + ' 课时';
+document.getElementById('cntB').textContent = GROUPS.B.length + ' 课时';
+
+var nodeEls = [];
+
+function buildSphere(vol, spinId) {
+    var spin = document.getElementById(spinId);
+    var list = GROUPS[vol] || [];
+    var n = list.length;
+
+    for (var r = 1; r <= 3; r++) {
+        var ring = document.createElement('div');
+        ring.className = 'ring r' + r;
+        spin.appendChild(ring);
+    }
+    var core = document.createElement('div');
+    core.className = 'core';
+    spin.appendChild(core);
+
+    list.forEach(function (k, i) {
+        var phi = Math.acos(1 - 2 * (i + 0.5) / n);
+        var theta = Math.PI * (1 + Math.sqrt(5)) * i;
+        var x = Math.cos(theta) * Math.sin(phi) * R;
+        var z = Math.sin(theta) * Math.sin(phi) * R;
+        var y = Math.cos(phi) * R;
+
+        var el = document.createElement('div');
+        el.className = 'node c' + (k.cid % 8);
+        el.innerHTML = '<div class="ball"></div><div class="label">' + k.name + '</div>';
+        el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,' + z.toFixed(1) + 'px)';
+        spin.appendChild(el);
+        nodeEls.push({ el: el, k: k, x: x, y: y, z: z, lab: el.querySelector('.label') });
+    });
+}
+buildSphere('A', 'spinA');
+buildSphere('B', 'spinB');
+
+/* tooltip */
+var tip = document.getElementById('tooltip');
+var cur = null;
+nodeEls.forEach(function (n) {
+    n.el.addEventListener('mouseenter', function (e) { cur = n; show(e, n); tip.style.opacity = 1; });
+    n.el.addEventListener('mousemove', function (e) { if (cur === n) show(e, n); });
+    n.el.addEventListener('mouseleave', function () { tip.style.opacity = 0; cur = null; });
+});
+function show(e, n) {
+    tip.innerHTML = '<div class="t-name">' + n.k.name + '</div><div class="t-unit">' +
+        (n.k.vol === 'A' ? '一年级上册' : '一年级下册') + ' · ' + n.k.unit +
+        '</div><div class="t-go">➜ 点击打开国家平台 · ' + n.k.name + ' 课时讲解</div>';
+    var x = e.clientX + 16, y = e.clientY - 8;
+    if (x + tip.offsetWidth > window.innerWidth - 8) x = e.clientX - tip.offsetWidth - 16;
+    if (y + tip.offsetHeight > window.innerHeight - 8) y = window.innerHeight - tip.offsetHeight - 8;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+
+/* 点击跳转 */
+var dragMoved = false;
+nodeEls.forEach(function (n) {
+    n.el.addEventListener('click', function () {
+        if (dragMoved) { dragMoved = false; return; }
+        window.open(n.k.url, '_blank');
+    });
+});
+
+/* ============ 旋转控制：慢速摆荡 + 拖拽 + 标签 billboard/深度淡出 ============ */
+var spins = [document.getElementById('spinA'), document.getElementById('spinB')];
+var stage = document.getElementById('stage');
+
+var ry = -22, rx = -8;                 /* 当前实际角度 */
+var ryBase = -22, rxBase = -8;         /* 拖拽累积的基准角度 */
+var auto = true, dragging = false;
+var lx = 0, ly = 0, dx0 = 0, dy0 = 0;
+var swingT = 0, lastTs = 0, idleTimer = null, lastTap = 0;
+
+/* 摆荡参数：周期越长＝越慢。Y 轴 ±16°/40 秒，X 轴 ±3°/26 秒 */
+var SW_Y_AMP = 16, SW_Y_T = 40, SW_X_AMP = 3, SW_X_T = 26;
+/* 标签开始出现的深度阈值（0=最远，1=最近） */
+var LAB_ON = 0.58, LAB_FULL = 0.72;
+
+var lastRy = 1e9, lastRx = 1e9;
+
+function apply() {
+    if (Math.abs(ry - lastRy) < 0.04 && Math.abs(rx - lastRx) < 0.04) return;
+    lastRy = ry; lastRx = rx;
+
+    var t = 'rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
+    spins[0].style.transform = t;
+    spins[1].style.transform = t;
+
+    /* 标签反向旋转＝始终正对屏幕（billboard） */
+    var bt = 'translateX(-50%) rotateY(' + (-ry).toFixed(2) + 'deg) rotateX(' + (-rx).toFixed(2) + 'deg)';
+
+    var crx = rx * Math.PI / 180, cry = ry * Math.PI / 180;
+    var cy = Math.cos(cry), sy = Math.sin(cry), cx = Math.cos(crx), sx = Math.sin(crx);
+
+    for (var i = 0; i < nodeEls.length; i++) {
+        var n = nodeEls[i];
+        /* 旋转后的深度 z（CSS 顺序 rotateX 再 rotateY ⇒ p' = Rx·Ry·p） */
+        var z1 = -n.x * sy + n.z * cy;
+        var z2 = n.y * sx + z1 * cx;
+        var o = (z2 + R) / (2 * R);
+        if (o < 0) o = 0; else if (o > 1) o = 1;
+
+        n.el.style.opacity = (0.20 + 0.80 * Math.pow(o, 1.5)).toFixed(3);
+
+        var lo = (o - LAB_ON) / (LAB_FULL - LAB_ON);
+        if (lo < 0) lo = 0; else if (lo > 1) lo = 1;
+        if (n.hover) lo = 1;
+        n.lab.style.opacity = lo.toFixed(3);
+        if (lo > 0.001) n.lab.style.transform = bt;
+    }
+}
+
+function swing(now) {
+    var dt = lastTs ? Math.min(0.05, (now - lastTs) / 1000) : 0;
+    lastTs = now;
+    if (auto && !dragging) {
+        swingT += dt;
+        ry = ryBase + Math.sin(swingT * (2 * Math.PI / SW_Y_T)) * SW_Y_AMP;
+        rx = rxBase + Math.sin(swingT * (2 * Math.PI / SW_X_T)) * SW_X_AMP;
+        apply();
+    }
+    requestAnimationFrame(swing);
+}
+
+/* 拖拽 */
+function beginDrag(x, y) {
+    dragging = true; auto = false; clearTimeout(idleTimer);
+    lx = x; ly = y; dx0 = x; dy0 = y;
+    stage.classList.add('dragging');
+    return true;
+}
+function moveDrag(x, y) {
+    if (!dragging) return;
+    if (Math.abs(x - dx0) + Math.abs(y - dy0) > 5) dragMoved = true;
+    ryBase += (x - lx) * 0.32;
+    rxBase += (y - ly) * 0.22;
+    if (rxBase > 85) rxBase = 85; else if (rxBase < -85) rxBase = -85;
+    ry = ryBase; rx = rxBase;
+    lx = x; ly = y; apply();
+}
+function endDrag() {
+    if (!dragging) return;
+    dragging = false; stage.classList.remove('dragging');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function () { swingT = 0; auto = true; }, 5000);
+}
+
+stage.addEventListener('mousedown', function (e) {
+    dragMoved = false;
+    if (e.target.closest('.node')) return;
+    beginDrag(e.clientX, e.clientY);
+});
+window.addEventListener('mousemove', function (e) { moveDrag(e.clientX, e.clientY); });
+window.addEventListener('mouseup', endDrag);
+
+/* ---- 触屏（iPad / 手机）：单指拖动旋转、单指点节点跳转、双击复位 ---- */
+stage.addEventListener('touchstart', function (e) {
+    dragMoved = false;
+    if (e.target.closest('.node')) return;
+    var t = e.touches[0]; beginDrag(t.clientX, t.clientY);
+}, { passive: true });
+window.addEventListener('touchmove', function (e) {
+    if (!dragging) return;
+    var t = e.touches[0];
+    moveDrag(t.clientX, t.clientY);
+    e.preventDefault();          /* 阻止 Safari 橡皮筋回弹 / 双指缩放 */
+}, { passive: false });
+window.addEventListener('touchend', function (e) {
+    /* 双指轻点两下复位视角（iOS 上 dblclick 不一定触发） */
+    if (!dragMoved) {
+        var now = Date.now();
+        if (now - lastTap < 330) { resetView(); lastTap = 0; }
+        else lastTap = now;
+    }
+    endDrag();
+}, { passive: true });
+window.addEventListener('touchcancel', endDrag);
+
+/* 双击复位视角 */
+function resetView() {
+    ryBase = -22; rxBase = -8; swingT = 0; auto = true;
+    clearTimeout(idleTimer);
+    ry = ryBase; rx = rxBase; lastRy = 1e9; apply();
+}
+stage.addEventListener('dblclick', resetView);
+
+/* hover 时强制显示该标签 */
+nodeEls.forEach(function (n) {
+    n.el.addEventListener('mouseenter', function () { n.hover = true; lastRy = 1e9; apply(); });
+    n.el.addEventListener('mouseleave', function () { n.hover = false; lastRy = 1e9; apply(); });
+});
+
+/* ============ 自适应布局：让 iPad 横屏 / 竖屏 / 手机 / 桌面都完整显示 ============ */
+var scene = document.getElementById('scene');
+var legendEl = document.getElementById('legend');
+var tagA = document.getElementById('tagA'), tagB = document.getElementById('tagB');
+var SEP = 300;                                   /* 两球中心到舞台中心的距离（与 CSS 的 ±300px 一致） */
+
+function layout() {
+    var w = window.innerWidth, h = window.innerHeight;
+    var legendW = (getComputedStyle(legendEl).display === 'none') ? 0 : legendEl.offsetWidth;
+    var shift = -legendW / 2;                    /* 把 3D 内容推到"去掉图例栏后"的可视中心 */
+
+    var hudH = (h < 700) ? 92 : 118;             /* 顶部标题区高度 */
+    var margin = 16;                             /* 视口边沿留白 */
+    var labelHalfW = 56;                         /* 标签半宽（max-width 132px，60% 在边缘时被 ellipsis） */
+    var labelBelow = 28;                         /* 标签往下 + margin-top + 行高 */
+
+    /* 按宽度算：左右两球外缘 + 标签都不能超出 viewport */
+    var availHalfW = (w - legendW) / 2 - margin - labelHalfW;
+    var availHalfH = (h - hudH) / 2 - margin - labelBelow;
+    var sepR = SEP + R;                          /* 中心到球外缘距离（沿球心连线） */
+
+    var sByW = availHalfW / sepR;
+    var sByH = availHalfH / R;
+    var s = Math.min(sByW, sByH);
+    if (s > 1) s = 1;
+    if (s < 0.34) s = 0.34;
+
+    scene.style.transform = 'translateX(' + shift.toFixed(1) + 'px) scale(' + s.toFixed(3) + ')';
+
+    /* 册次标签跟随缩放，始终贴在各自球体正下方 */
+    var cx = w / 2 + shift, cy = h / 2;
+    var dy = (R + 42) * s;
+    tagA.style.left = (cx - SEP * s) + 'px';
+    tagB.style.left = (cx + SEP * s) + 'px';
+    tagA.style.top = (cy + dy) + 'px';
+    tagB.style.top = (cy + dy) + 'px';
+    return s;
+}
+
+layout();
+apply();
+requestAnimationFrame(swing);
+
+var rzT = null;
+function relayout() {
+    clearTimeout(rzT);
+    rzT = setTimeout(function () { layout(); lastRy = 1e9; apply(); }, 100);
+}
+window.addEventListener('resize', relayout);
+window.addEventListener('orientationchange', function () {
+    clearTimeout(rzT);
+    rzT = setTimeout(function () { layout(); lastRy = 1e9; apply(); }, 300);
+});
+if (window.visualViewport) window.visualViewport.addEventListener('resize', relayout);
+
+/* 图例：按册次 → 单元 → 课时（可折叠） */
+(function () {
+    var body = document.getElementById('legendBody');
+    var html = '';
+    ['A', 'B'].forEach(function (vol) {
+        html += '<div class="lg-vol">' + (vol === 'A' ? '一年级 · 上册' : '一年级 · 下册') + '</div>';
+        var seen = [], map = {};
+        GROUPS[vol].forEach(function (k) { if (!map[k.unit]) { map[k.unit] = []; seen.push(k.unit); } map[k.unit].push(k); });
+        seen.forEach(function (unit, ui) {
+            var lessons = map[unit];
+            var color = 'c' + (lessons[0].cid % 8);
+            var bg = { 0:'#ff5a4e',1:'#ff9a2e',2:'#f5cf1f',3:'#84d944',4:'#1fc9a2',5:'#35bcec',6:'#6270f5',7:'#ab5fee' }[lessons[0].cid % 8];
+            html += '<div class="lg-unit" data-t="' + vol + ui + '"><span class="lg-dot" style="background:' + bg + '"></span>' +
+                    unit + ' <span style="color:rgba(255,255,255,.45);font-size:11px">(' + lessons.length + ')</span>' +
+                    '<span class="lg-caret">▸</span></div>';
+            html += '<div class="lg-lessons" id="lg-' + vol + ui + '">';
+            lessons.forEach(function (k, li) {
+                html += '<div class="lg-lesson" data-u="' + k.url + '">' + (li + 1) + '. ' + k.name + '</div>';
+            });
+            html += '</div>';
+        });
+    });
+    body.innerHTML = html;
+
+    body.querySelectorAll('.lg-unit').forEach(function (el) {
+        el.addEventListener('click', function () {
+            var box = document.getElementById('lg-' + this.dataset.t);
+            var open = box.classList.toggle('open');
+            this.querySelector('.lg-caret').style.transform = open ? 'rotate(90deg)' : '';
+        });
+    });
+    body.querySelectorAll('.lg-lesson').forEach(function (el) {
+        el.addEventListener('click', function () { window.open(this.dataset.u, '_blank'); });
+    });
+})();
+</script>
+</body>
+</html>

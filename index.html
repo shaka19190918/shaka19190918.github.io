@@ -1,108 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>学习工具站</title>
-    <meta name="description" content="在线学习工具集合：幼小衔接快乐营、小学一年级数学 3D 知识点星球">
-    <meta name="theme-color" content="#0a1020">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="学习工具">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1020'/%3E%3Ccircle cx='22' cy='24' r='9' fill='%23ff9a2e'/%3E%3Ccircle cx='43' cy='38' r='7' fill='%2335bcec'/%3E%3Ccircle cx='41' cy='19' r='4' fill='%23f5cf1f'/%3E%3Ccircle cx='20' cy='45' r='3.5' fill='%2384d944'/%3E%3C/svg%3E">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            min-height: 100vh;
-            background: radial-gradient(ellipse at 50% 0%, #1d2c4d 0%, #0d1526 55%, #05080f 100%);
-            font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-            color: #e6eeff;
-            display: flex; flex-direction: column; align-items: center;
-            padding: max(44px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
-            -webkit-font-smoothing: antialiased;
-        }
-        header { text-align: center; margin-bottom: 34px; }
-        header h1 {
-            font-size: 27px; font-weight: 800; letter-spacing: 3px;
-            text-shadow: 0 2px 18px rgba(90,150,255,.5);
-        }
-        header p { margin-top: 9px; font-size: 13px; color: rgba(230,238,255,.58); letter-spacing: .5px; }
-
-        .grid {
-            width: 100%; max-width: 720px;
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 18px;
-        }
-        .card {
-            display: block; text-decoration: none; color: inherit;
-            padding: 24px 22px 20px; border-radius: 18px;
-            background: rgba(255,255,255,.055);
-            border: 1px solid rgba(150,190,255,.16);
-            backdrop-filter: blur(6px);
-            transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
-        }
-        .card:hover, .card:active {
-            transform: translateY(-4px);
-            background: rgba(255,255,255,.1);
-            border-color: rgba(150,190,255,.45);
-            box-shadow: 0 12px 34px rgba(0,0,0,.45);
-        }
-        .card .ico {
-            width: 52px; height: 52px; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 27px; line-height: 1; margin-bottom: 15px;
-        }
-        .card:nth-child(1) .ico { background: linear-gradient(135deg, #AD7BFF, #F28AB2); }
-        .card:nth-child(2) .ico { background: linear-gradient(135deg, #FF9A2E, #35BCEC); }
-
-        .card h2 { font-size: 17px; font-weight: 700; letter-spacing: .5px; }
-        .card p {
-            margin-top: 8px; font-size: 12.5px; line-height: 1.7;
-            color: rgba(230,238,255,.62);
-        }
-        .card .go {
-            display: inline-flex; align-items: center; gap: 5px;
-            margin-top: 15px; font-size: 12.5px; font-weight: 700; color: #7cc0ff;
-        }
-        .card:hover .go { color: #ffd24a; }
-
-        footer {
-            margin-top: 42px; text-align: center;
-            font-size: 11.5px; line-height: 1.9; color: rgba(230,238,255,.35);
-        }
-        footer a { color: rgba(124,192,255,.7); text-decoration: none; }
-
-        @media (max-width: 560px) {
-            header h1 { font-size: 22px; }
-            .card { padding: 20px 18px 17px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>一年级数学 · 3D知识点星球</title>
+<meta http-equiv="refresh" content="0; url=/zzxiaoxue/">
+<meta name="theme-color" content="#0a1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
-<body>
-    <header>
-        <h1>学习工具站</h1>
-        <p>点击任一工具即可开始使用</p>
-    </header>
-
-    <div class="grid">
-        <a class="card" href="https://shaka19190918.github.io/youxiao-xianjie/">
-            <div class="ico">🧩</div>
-            <h2>幼小衔接快乐营</h2>
-            <p>识字写字、古诗、拼音、数学、英语、习惯养成与专注力训练，含打卡记录、伙伴系统与家长中心。</p>
-            <span class="go">进入 <span>→</span></span>
-        </a>
-
-        <a class="card" href="https://shaka19190918.github.io/zzxiaoxue/">
-            <div class="ico">🔢</div>
-            <h2>一年级数学 · 3D 知识点星球</h2>
-            <p>人教版 2024 新教材，上下册共 79 个课时的 3D 图谱。点击任一课节星球，直达国家中小学智慧教育平台对应课时讲解。</p>
-            <span class="go">进入 <span>→</span></span>
-        </a>
-    </div>
-
-    <footer>
-        Powered by GitHub Pages<br>
-        教材数据来源：<a href="https://basic.smartedu.cn/" target="_blank" rel="noopener">国家中小学智慧教育平台</a>
-    </footer>
+<body style="margin:0;font-family:system-ui,'PingFang SC','Microsoft YaHei',sans-serif;background:#0a1020;color:#dce8ff;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:10px;text-align:center">
+<div style="font-size:19px;font-weight:800">一年级数学 · 3D 知识点星球</div>
+<div style="font-size:14px;opacity:.7">已搬家到新地址，正在跳转…</div>
+<a href="/zzxiaoxue/" style="color:#7cc0ff;font-size:14px;margin-top:8px;text-decoration:none">如未自动跳转，点此访问 →</a>
 </body>
 </html>

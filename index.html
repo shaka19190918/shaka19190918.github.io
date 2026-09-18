@@ -2,135 +2,256 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>小学学习 3D 课节门户</title>
-<meta name="description" content="幼小衔接快乐营、一年级数学 3D 知识点星球、外研社英语 3D 螺旋课节——课节节点一键直达国家中小学智慧教育平台官方讲解。">
-<meta name="theme-color" content="#0a1020">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="学习3D门户">
-<meta property="og:title" content="小学学习 3D 课节门户">
-<meta property="og:description" content="数学 79 课时 · 英语 34 节 · 幼小衔接快乐营">
-<meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a1020'/%3E%3Ccircle cx='22' cy='24' r='9' fill='%23ff9a2e'/%3E%3Ccircle cx='43' cy='38' r='7' fill='%2335bcec'/%3E%3Ccircle cx='41' cy='19' r='4' fill='%23f5cf1f'/%3E%3Ccircle cx='20' cy='45' r='3.5' fill='%2384d944'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#A66CFF">
+<title>小学学习 · 3D 课节门户</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-html { -webkit-text-size-adjust:100%; }
-body {
-  min-height:100vh; min-height:100dvh;
-  background:radial-gradient(ellipse at 50% 0%, #1d2c4d 0%, #0d1526 55%, #05080f 100%);
-  font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  color:#e6eeff; -webkit-font-smoothing:antialiased;
-  display:flex; flex-direction:column; align-items:center;
-  padding:max(40px, env(safe-area-inset-top)) 22px max(36px, env(safe-area-inset-bottom));
-  overflow-x:hidden;
+:root{
+  --pri:#A66CFF; --pri-l:#F1E9FF; --pri-d:#8B4AE8;
+  --accent:#F28AB2; --accent-l:#FCE4EC;
+  --math:#FFD567; --math-l:#FFF8E1;
+  --cn:#49C7C0; --cn-l:#E0F7FA;
+  --habit:#69C98C; --habit-l:#E8F5E9;
+  --eng:#4FC3F7; --eng-l:#E3F2FD;
+  --bg:#FAF7FF; --bg-alt:#F5F0FA;
+  --card:#FFF; --txt:#332C43; --tx2:#80778E;
+  --sh:0 8px 28px rgba(94,70,150,.10);
+  --sh-hover:0 16px 48px rgba(94,70,150,.18);
+  --r:24px; --r-lg:32px;
+  --sb:env(safe-area-inset-bottom,0px);
+  --st:env(safe-area-inset-top,0px);
 }
-#stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
-body > *:not(#stars) { position:relative; z-index:1; }
-
-header { text-align:center; margin-bottom:30px; }
-header h1 { font-size:27px; font-weight:800; letter-spacing:2.5px; text-shadow:0 2px 18px rgba(90,150,255,.45); }
-header p { margin-top:9px; font-size:13px; color:rgba(230,238,255,.6); letter-spacing:.5px; }
-header .srcnote { margin-top:7px; font-size:11.5px; color:rgba(230,238,255,.38); }
-header .srcnote a { color:rgba(124,192,255,.75); text-decoration:none; }
-
-.grid { width:100%; max-width:1020px; display:grid; grid-template-columns:repeat(auto-fit, minmax(258px,1fr)); gap:18px; }
-
-.card {
-  position:relative; display:flex; flex-direction:column;
-  text-decoration:none; color:inherit; overflow:hidden;
-  padding:22px 20px 18px; border-radius:18px;
-  background:rgba(255,255,255,.055); border:1px solid rgba(150,190,255,.16);
-  backdrop-filter:blur(6px);
-  transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*, *::before, *::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--txt);
+  min-height:100vh; overflow-x:hidden;
+  line-height:1.5; -webkit-font-smoothing:antialiased;
 }
-.card:hover, .card:active { transform:translateY(-5px); background:rgba(255,255,255,.1); border-color:rgba(150,190,255,.5); box-shadow:0 14px 38px rgba(0,0,0,.5); }
-.card:focus-visible { outline:2px solid #ffd24a; outline-offset:3px; }
-
-.badge { position:absolute; top:14px; right:14px; padding:3px 9px; border-radius:20px; font-size:10.5px; font-weight:700; letter-spacing:.6px; }
-.badge.new { background:linear-gradient(135deg,#ff9a2e,#ff5a4e); color:#fff; box-shadow:0 2px 10px rgba(255,120,60,.45); }
-.badge.cnt { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22); color:rgba(230,238,255,.85); }
-
-.ico { width:52px; height:52px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:26px; line-height:1; margin-bottom:14px; box-shadow:0 6px 18px rgba(0,0,0,.35); }
-.card.c1 .ico { background:linear-gradient(135deg,#AD7BFF,#F28AB2); }
-.card.c2 .ico { background:linear-gradient(135deg,#FF9A2E,#35BCEC); }
-.card.c3 .ico { background:linear-gradient(135deg,#35BCEC,#84D944); }
-
-.card h2 { font-size:16.5px; font-weight:700; letter-spacing:.4px; line-height:1.4; padding-right:52px; }
-.card .meta { margin-top:6px; font-size:11.5px; color:rgba(230,238,255,.45); letter-spacing:.3px; }
-.card p { margin-top:10px; font-size:12.5px; line-height:1.75; color:rgba(230,238,255,.64); flex:1; }
-.card .go { display:inline-flex; align-items:center; gap:5px; margin-top:15px; font-size:12.5px; font-weight:700; color:#7cc0ff; }
-.card:hover .go { color:#ffd24a; }
-
-footer { margin-top:38px; text-align:center; font-size:11.5px; line-height:1.9; color:rgba(230,238,255,.35); }
-footer a { color:rgba(124,192,255,.7); text-decoration:none; }
-
-@media (max-width:560px){
-  header h1 { font-size:22px; }
-  .grid { gap:14px; }
-  .card { padding:19px 17px 16px; }
+@media (orientation:landscape) and (max-height:560px){
+  :root{--r:20px; --r-lg:28px}
+  .hero{min-height:auto;padding:48px 0}
+  .hero h1{font-size:clamp(28px,4.5vw,38px)}
+  .hero p{font-size:14px}
+  .grid{gap:16px}
+  .card{padding:20px}
+  .card .icon{width:64px;height:64px;font-size:28px}
+  .card h2{font-size:16px}
+  footer{padding:20px 24px}
 }
-/* iPad 横屏高度不足时压缩留白 */
-@media (max-height:700px){
-  body { padding-top:max(24px, env(safe-area-inset-top)); }
-  header { margin-bottom:20px; }
-  header h1 { font-size:22px; }
-  footer { margin-top:24px; }
+@media (orientation:portrait) and (max-width:700px){
+  :root{--r:20px; --r-lg:28px}
+  .hero{padding:40px 20px}
+  .hero h1{font-size:28px}
+  .grid{grid-template-columns:1fr;gap:14px;padding:0 16px;padding-bottom:calc(60px+var(--sb))}
+  .card{padding:18px}
+  .card .icon{width:60px;height:60px;font-size:26px}
+  .card h2{font-size:15px}
+  footer{padding:18px 16px}
+}
+.page-wrap{
+  display:grid; grid-template-rows:auto 1fr auto; min-height:100vh;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(166,108,255,.12), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(242,138,178,.1), transparent),
+    var(--bg);
+}
+header{
+  position:sticky; top:0; z-index:100;
+  background:rgba(250,247,255,.85);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(166,108,255,.08);
+  padding:14px 24px; padding-top:max(14px,var(--st));
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  flex-wrap:wrap;
+}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--txt)}
+.logo svg{width:36px;height:36px;flex-shrink:0}
+.logo span{font-size:18px;font-weight:800;letter-spacing:.5px;background:linear-gradient(135deg,var(--pri),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{font-size:12px;color:var(--tx2);white-space:nowrap}
+main{padding:0 24px}
+.hero{
+  text-align:center; padding:64px 0 32px;
+  position:relative; overflow:hidden;
+}
+.hero::before{
+  content:''; position:absolute; inset:0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(166,108,255,.08), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(242,138,178,.06), transparent 40%);
+  pointer-events:none;
+}
+.hero h1{
+  font-size:clamp(32px,5vw,48px); font-weight:800; line-height:1.2;
+  background:linear-gradient(135deg,var(--pri),var(--accent),var(--pri));
+  background-size:200% 200%; -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation:gradientShift 6s ease-in-out infinite;
+  margin-bottom:12px; position:relative; z-index:1;
+}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero p{font-size:clamp(14px,2vw,18px);color:var(--tx2);max-width:640px;margin:0 auto;position:relative;z-index:1}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+  max-width:1120px; margin:0 auto 40px;
+  padding-bottom:40px;
+}
+@media (max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+.card{
+  background:var(--card); border-radius:var(--r-lg); padding:28px;
+  box-shadow:var(--sh); border:1px solid rgba(166,108,255,.06);
+  display:flex; flex-direction:column; align-items:flex-start; gap:16px;
+  text-decoration:none; color:inherit;
+  transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, border-color .25s;
+  position:relative; overflow:hidden;
+}
+.card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:4px;
+  background:var(--card-accent,var(--pri));
+  transform:scaleX(0); transform-origin:left; transition:transform .35s cubic-bezier(.2,.8,.2,1);
+}
+.card:hover,.card:focus-within{
+  transform:translateY(-6px); box-shadow:var(--sh-hover);
+  border-color:rgba(166,108,255,.15);
+}
+.card:hover::before,.card:focus-within::before{transform:scaleX(1)}
+.card:active{transform:translateY(-2px) scale(.99)}
+.card .icon{
+  width:72px; height:72px; border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px; flex-shrink:0;
+  background:var(--card-icon-bg,var(--pri-l));
+  color:var(--card-icon-color,var(--pri));
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+  transition:transform .25s, box-shadow .25s;
+}
+.card:hover .icon{transform:scale(1.08); box-shadow:0 8px 20px rgba(0,0,0,.1)}
+.card h2{font-size:18px;font-weight:800;line-height:1.3}
+.card .desc{font-size:13px;color:var(--tx2);line-height:1.6;flex:1}
+.card .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.badge{
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;
+  background:var(--badge-bg,var(--pri-l));color:var(--badge-color,var(--pri));
+}
+.badge.new{background:linear-gradient(135deg,var(--math),#FFA726);color:#5D4037;animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,213,103,.4)}50%{box-shadow:0 0 0 8px rgba(255,213,103,0)}}
+.badge.hot{background:linear-gradient(135deg,#FF6B6B,#FF8E53);color:#FFF}
+.card .arrow{
+  position:absolute; right:24px; bottom:24px;
+  width:40px; height:40px; border-radius:50%;
+  background:linear-gradient(135deg,var(--pri),var(--accent));
+  color:#FFF; display:flex; align-items:center; justify-content:center;
+  font-size:18px; opacity:.7; transform:translateX(-4px);
+  transition:transform .25s, opacity .25s;
+}
+.card:hover .arrow,.card:focus-within .arrow{transform:translateX(4px);opacity:1}
+footer{
+  text-align:center; padding:32px 24px;
+  border-top:1px solid rgba(166,108,255,.08);
+  background:rgba(250,247,255,.6); backdrop-filter:blur(8px);
+  color:var(--tx2); font-size:13px; line-height:1.8;
+}
+footer a{color:var(--pri);text-decoration:none;font-weight:600}
+footer a:hover{text-decoration:underline}
+.copyright{margin-top:8px;font-size:11px;opacity:.7}
+.floating-shapes{
+  position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;
+}
+.shape{
+  position:absolute; border-radius:50%;
+  background:linear-gradient(135deg,rgba(166,108,255,.08),rgba(242,138,178,.05));
+  animation:float 20s ease-in-out infinite;
+}
+.shape:nth-child(1){width:180px;height:180px;top:10%;left:-50px;animation-delay:0s;animation-duration:22s}
+.shape:nth-child(2){width:120px;height:120px;top:60%;right:-30px;animation-delay:3s;animation-duration:18s}
+.shape:nth-child(3){width:80px;height:80px;bottom:10%;left:10%;animation-delay:6s;animation-duration:25s}
+.shape:nth-child(4){width:150px;height:150px;top:20%;right:15%;animation-delay:9s;animation-duration:20s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-20px) scale(1.05)}50%{transform:translate(-20px,30px) scale(.95)}75%{transform:translate(25px,25px) scale(1.02)}}
+@media (prefers-reduced-motion:reduce){
+  .hero h1{animation:none}
+  .shape{animation:none}
+  .badge.new{animation:none}
+  .card,.card .icon,.card .arrow{transition:none}
 }
 </style>
 </head>
 <body>
-<div id="stars"></div>
-
-<header>
-  <h1>小学学习 · 3D 课节门户</h1>
-  <p>点击任一课节图谱，进入后可点击每个星球直达国家平台官方讲解</p>
-  <div class="srcnote">教材数据来源：<a href="https://basic.smartedu.cn/" target="_blank" rel="noopener">国家中小学智慧教育平台</a></div>
-</header>
-
-<div class="grid">
-  <a class="card c2" href="/zzxiaoxue/">
-    <span class="badge cnt">79 课时</span>
-    <div class="ico">🔢</div>
-    <h2>一年级数学 · 3D 知识点星球</h2>
-    <div class="meta">人教版 2024 新教材 · 上下册</div>
-    <p>双球 3D 图谱，上册橙核 / 下册蓝核，共 79 个课时节点。点击任一课节星球，直达国家平台对应课时讲解。</p>
-    <span class="go">进入 <span>→</span></span>
-  </a>
-
-  <a class="card c3" href="/zzxiaoxue/fltrp/?v=2">
-    <span class="badge new">NEW</span>
-    <div class="ico">🔤</div>
-    <h2>外研社英语 · 3D 螺旋课节</h2>
-    <div class="meta">一年级起点（主编：陈琳）· 上下册 30 节</div>
-    <p>螺旋上升塔结构，30 节官方课程包按 Module 彩色色带攀升。点击任一课节，直达国家平台对应课时（含教学视频）。</p>
-    <span class="go">进入 <span>→</span></span>
-  </a>
-
-  <a class="card c1" href="/youxiao-xianjie/">
-    <span class="badge cnt">全学科</span>
-    <div class="ico">🧩</div>
-    <h2>幼小衔接快乐营</h2>
-    <div class="meta">识字 · 古诗 · 拼音 · 数学 · 英语 · 习惯养成</div>
-    <p>含打卡记录、伙伴系统与家长中心，覆盖幼小衔接阶段的学科启蒙与专注力训练。</p>
-    <span class="go">进入 <span>→</span></span>
-  </a>
+<div class="floating-shapes" aria-hidden="true">
+  <div class="shape"></div><div class="shape"></div><div class="shape"></div><div class="shape"></div>
 </div>
-
+<div class="page-wrap">
+<header>
+  <a href="/" class="logo" aria-label="返回首页">
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="64" height="64" rx="16" fill="url(#g)"/>
+      <path d="M18 22h28M18 32h22M18 42h16" stroke="white" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="46" cy="46" r="10" fill="url(#g2)"/>
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="64" y2="64"><stop offset="0%" stop-color="#A66CFF"/><stop offset="100%" stop-color="#F28AB2"/></linearGradient>
+        <linearGradient id="g2" x1="36" y1="36" x2="56" y2="56"><stop offset="0%" stop-color="#FFD567"/><stop offset="100%" stop-color="#FFA726"/></linearGradient>
+      </defs>
+    </svg>
+    <span>小学学习门户</span>
+  </a>
+  <span class="tagline">3D 课节 · 智慧启蒙</span>
+</header>
+<main>
+  <section class="hero" aria-labelledby="portal-title">
+    <h1 id="portal-title">小学学习 · 3D 课节门户</h1>
+    <p>点击任一课节图谱，直达国家中小学智慧教育平台官方讲解资源 · 全学科覆盖 · 沉浸式探索</p>
+  </section>
+  <div class="grid" role="list">
+    <!-- 1. 一年级数学 3D 知识点星球 -->
+    <a href="/zzxiaoxue/" class="card" role="listitem" aria-label="一年级数学 · 3D 知识点星球 - 人教版 2024 新教材，79 课时双球 3D 图谱">
+      <div class="icon" style="--card-icon-bg:#FFE0E0;--card-icon-color:#E53935" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20M12 2a10 10 0 0 0 0 20"/><path d="M2 12a10 10 0 0 1 20 0M2 12a10 10 0 0 0 20 0"/></svg>
+      </div>
+      <h2>一年级数学 · 3D 知识点星球</h2>
+      <p class="desc">人教版 2024 新教材 · 上下册 · 双球 3D 图谱（上册橙核 / 下册蓝核）</p>
+      <div class="meta">
+        <span class="badge" style="--badge-bg:#FFE0E0;--badge-color:#E53935">79 课时</span>
+        <span class="badge" style="--badge-bg:#E3F2FD;--badge-color:#1976D2">人教版 2024</span>
+      </div>
+      <span class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+    <!-- 2. 外研社英语 3D 螺旋课节 -->
+    <a href="/zzxiaoxue/fltrp/?v=2" class="card" role="listitem" aria-label="外研社英语 · 3D 螺旋课节 - 一年级起点 30 节，螺旋上升塔结构">
+      <div class="icon" style="--card-icon-bg:#E3F2FD;--card-icon-color:#1976D2" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/><path d="M12 1v4m0 16v4M4.22 4.22l2.83 2.83m11.31 11.31l2.83 2.83"/></svg>
+      </div>
+      <span class="badge new">NEW</span>
+      <h2>外研社英语 · 3D 螺旋课节</h2>
+      <p class="desc">一年级起点（主编：陈琳）· 上下册 30 节 · 螺旋上升塔结构，按 Module 彩色色带攀升</p>
+      <div class="meta">
+        <span class="badge" style="--badge-bg:#E3F2FD;--badge-color:#1976D2">30 课时</span>
+        <span class="badge" style="--badge-bg:#F3E5F5;--badge-color:#7B1FA2">外研社版</span>
+      </div>
+      <span class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+    <!-- 3. 幼小衔接快乐营 -->
+    <a href="/youxiao-xianjie/" class="card" role="listitem" aria-label="幼小衔接快乐营 - 识字·古诗·拼音·数学·英语·习惯养成，含打卡记录、伙伴系统与家长中心">
+      <div class="icon" style="--card-icon-bg:#F3E5F5;--card-icon-color:#A66CFF" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <h2>幼小衔接快乐营</h2>
+      <p class="desc">识字 · 古诗 · 拼音 · 数学 · 英语 · 习惯养成 · 含打卡记录、伙伴系统与家长中心</p>
+      <div class="meta">
+        <span class="badge" style="--badge-bg:#F1E9FF;--badge-color:#A66CFF">全学科</span>
+        <span class="badge hot">核心推荐</span>
+      </div>
+      <span class="arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+    </a>
+  </div>
+</main>
 <footer>
-  Powered by GitHub Pages · 建议使用 iPad 横屏或电脑访问 3D 课节图谱<br>
-  课节讲解版权归国家中小学智慧教育平台所有
+  <p>数据来源：<a href="https://basic.smartedu.cn/" target="_blank" rel="noopener">国家中小学智慧教育平台</a> · 技术支撑：GitHub Pages</p>
+  <p class="copyright">建议使用 iPad 横屏或电脑访问 3D 课节图谱以获得最佳体验 · 课节讲解版权归国家中小学智慧教育平台所有</p>
 </footer>
-
-<script>
-(function(){
-  var s=document.getElementById('stars'), h='';
-  for(var i=0;i<80;i++){
-    var sz=(Math.random()*2+1).toFixed(1);
-    h+='<div style="position:absolute;left:'+(Math.random()*100).toFixed(2)+'%;top:'+(Math.random()*100).toFixed(2)+'%;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:rgba(255,255,255,'+(Math.random()*.45+.25).toFixed(2)+');box-shadow:0 0 '+(sz*2)+'px rgba(180,210,255,.6);"></div>';
-  }
-  s.innerHTML=h;
-})();
-</script>
+</div>
 </body>
 </html>

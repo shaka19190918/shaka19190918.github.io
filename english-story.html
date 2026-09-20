@@ -65,7 +65,7 @@ body{
 
 /* 舞台 / 插图 */
 .stage{position:relative;border-radius:22px;overflow:hidden;margin-bottom:14px;
-  background:var(--scene-bg,#EAF2FF);min-height:280px}
+  background:var(--scene-bg,#EAF2FF);min-height:360px}
 .stage svg.scene-bg{display:block;width:100%;height:100%;position:absolute;inset:0}
 .stage .caption{position:absolute;left:0;right:0;top:0;z-index:4;
   background:linear-gradient(to bottom,rgba(28,18,48,.6),rgba(28,18,48,0));
@@ -397,16 +397,17 @@ video#preview{width:100%;max-width:420px;border-radius:16px;background:#241E33;m
 var CHARACTERS = {
   /* pitch/rate 为角色的"基准嗓"；每一句还会叠加 line.tone 的情绪修饰。
      基准音高的上限刻意留在 1.50 —— 这样"兴奋/惊讶"还能继续往上走，
-     否则 highest 情绪会被 Web Speech 的 2.0 上限压成一条平线。 */
-  piggie: { name:'Piggie', cn:'小猪',  em:'🐷', bg:'#FCE4EC', accent:'#E8709A', pitch:1.62, rate:1.10, voice:'高亢甜脆',
+     否则 highest 情绪会被 Web Speech 的 2.0 上限压成一条平线。
+     语速整体降低 15%，适合 4-8 岁儿童听辨。 */
+  piggie: { name:'Piggie', cn:'小猪',  em:'🐷', bg:'#FCE4EC', accent:'#E8709A', pitch:1.62, rate:0.94, voice:'高亢甜脆',
             pos:[[30,54],[66,50],[46,52],[70,54]] },
-  gerald: { name:'Gerald', cn:'小象',  em:'🐘', bg:'#E3F2FD', accent:'#3E9AD4', pitch:0.26, rate:0.74, voice:'低沉慢吞吞',
+  gerald: { name:'Gerald', cn:'小象',  em:'🐘', bg:'#E3F2FD', accent:'#3E9AD4', pitch:0.26, rate:0.63, voice:'低沉慢吞吞',
             pos:[[34,56],[70,52],[50,54],[32,54]] },
-  snake:  { name:'Snake',  cn:'小蛇',  em:'🐍', bg:'#E8F5E9', accent:'#4CAF7D', pitch:1.78, rate:1.32, voice:'尖细急促',
+  snake:  { name:'Snake',  cn:'小蛇',  em:'🐍', bg:'#E8F5E9', accent:'#4CAF7D', pitch:1.78, rate:0.95, voice:'尖细急促',
             pos:[[30,58],[62,72],[38,56],[68,50]] },
-  puppy:  { name:'Puppy',  cn:'小狗',  em:'🐶', bg:'#FFF8E1', accent:'#D3A017', pitch:1.48, rate:1.08, voice:'明亮欢快',
+  puppy:  { name:'Puppy',  cn:'小狗',  em:'🐶', bg:'#FFF8E1', accent:'#D3A017', pitch:1.48, rate:0.92, voice:'明亮欢快',
             pos:[[30,58],[68,54],[48,56],[66,52]] },
-  nah:    { name:'Narrator', cn:'旁白', em:'📖', bg:'#F1E9FF', accent:'#8B4AE8', pitch:0.94, rate:0.84, voice:'慢条斯理',
+  nah:    { name:'Narrator', cn:'旁白', em:'📖', bg:'#F1E9FF', accent:'#8B4AE8', pitch:0.94, rate:0.71, voice:'慢条斯理',
             pos:[[50,50],[50,50],[50,50],[50,50]] }
 };
 
@@ -883,6 +884,8 @@ function selectStory(story, el) {
   state.lineIndex = 0;
   state.showCn = true;
   $('cnToggleBtn').textContent = '中文：开';
+  /* 隐藏选书面板，只显示学习界面 */
+  document.querySelector('.panel').classList.add('hidden');
   renderCast();
   renderStage();
   renderLines();

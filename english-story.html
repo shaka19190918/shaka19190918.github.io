@@ -80,23 +80,29 @@ body{
   display:flex;flex-direction:column;align-items:center}
 .stage .actor.slot-l{left:2%}
 .stage .actor.slot-r{right:2%}
-.stage .actor .art{width:100%;max-width:118px;aspect-ratio:1;
-  filter:drop-shadow(0 7px 12px rgba(40,25,70,.22))}
+.stage .actor .art{width:100%;max-width:138px;aspect-ratio:1;
+  filter:drop-shadow(0 9px 14px rgba(40,25,70,.28))}
 .stage .actor .art svg{width:100%;height:100%;display:block}
 .stage .actor.mirror .art svg{transform:scaleX(-1)}
 .stage .actor .tag{margin-top:5px;font-size:11px;font-weight:800;color:#FFF;
   padding:2px 11px;border-radius:11px;letter-spacing:.4px;white-space:nowrap;
   box-shadow:0 3px 9px rgba(40,25,70,.24)}
-.stage .actor.talking .art{animation:bob .9s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@media (prefers-reduced-motion:reduce){.stage .actor.talking .art{animation:none}}
+.stage .actor.talking .art{animation:bob .75s ease-in-out infinite}
+.stage .actor.mirror.talking .art{animation-name:bob}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-9px) rotate(-2deg)}50%{transform:translateY(-13px) rotate(0)}75%{transform:translateY(-9px) rotate(2deg)}}
+.stage .actor.mirror.talking .art svg{transform:scaleX(-1)}
+.stage .actor:not(.talking) .art{animation:breathe 3.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.stage .actor .art{animation:none}}
 
 /* 气泡：只出现在正在说话的角色头顶，空间独占，绝不叠字 */
 .stage .say{position:absolute;z-index:3;top:38px;width:46%;max-width:290px;
-  background:#FFF;border-radius:15px;padding:9px 12px 10px;
-  border:3px solid var(--c-accent,#A66CFF);
-  box-shadow:0 8px 22px rgba(70,45,120,.22);cursor:pointer;
-  transition:transform .16s,box-shadow .16s}
+  background:#FFF;border-radius:17px;padding:10px 13px 11px;
+  border:4px solid var(--c-accent,#A66CFF);
+  box-shadow:0 10px 26px rgba(70,45,120,.28);cursor:pointer;
+  transition:transform .16s,box-shadow .16s;
+  animation:popIn .38s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
 .stage .say:hover{transform:scale(1.03);box-shadow:0 12px 28px rgba(70,45,120,.3)}
 .stage .say:active{transform:scale(.97)}
 .stage .say.bub-l{left:2%}
@@ -392,32 +398,32 @@ var CHARACTERS = {
   /* pitch/rate 为角色的"基准嗓"；每一句还会叠加 line.tone 的情绪修饰。
      基准音高的上限刻意留在 1.50 —— 这样"兴奋/惊讶"还能继续往上走，
      否则 highest 情绪会被 Web Speech 的 2.0 上限压成一条平线。 */
-  piggie: { name:'Piggie', cn:'小猪',  em:'🐷', bg:'#FCE4EC', accent:'#E8709A', pitch:1.50, rate:1.06, voice:'清脆高音',
+  piggie: { name:'Piggie', cn:'小猪',  em:'🐷', bg:'#FCE4EC', accent:'#E8709A', pitch:1.62, rate:1.10, voice:'高亢甜脆',
             pos:[[30,54],[66,50],[46,52],[70,54]] },
-  gerald: { name:'Gerald', cn:'小象',  em:'🐘', bg:'#E3F2FD', accent:'#3E9AD4', pitch:0.32, rate:0.80, voice:'低沉慢速',
+  gerald: { name:'Gerald', cn:'小象',  em:'🐘', bg:'#E3F2FD', accent:'#3E9AD4', pitch:0.26, rate:0.74, voice:'低沉慢吞吞',
             pos:[[34,56],[70,52],[50,54],[32,54]] },
-  snake:  { name:'Snake',  cn:'小蛇',  em:'🐍', bg:'#E8F5E9', accent:'#4CAF7D', pitch:1.62, rate:1.24, voice:'尖细快语',
+  snake:  { name:'Snake',  cn:'小蛇',  em:'🐍', bg:'#E8F5E9', accent:'#4CAF7D', pitch:1.78, rate:1.32, voice:'尖细急促',
             pos:[[30,58],[62,72],[38,56],[68,50]] },
-  puppy:  { name:'Puppy',  cn:'小狗',  em:'🐶', bg:'#FFF8E1', accent:'#D3A017', pitch:1.42, rate:1.04, voice:'明亮中高',
+  puppy:  { name:'Puppy',  cn:'小狗',  em:'🐶', bg:'#FFF8E1', accent:'#D3A017', pitch:1.48, rate:1.08, voice:'明亮欢快',
             pos:[[30,58],[68,54],[48,56],[66,52]] },
-  nah:    { name:'Narrator', cn:'旁白', em:'📖', bg:'#F1E9FF', accent:'#8B4AE8', pitch:1.00, rate:0.86, voice:'平稳叙述',
+  nah:    { name:'Narrator', cn:'旁白', em:'📖', bg:'#F1E9FF', accent:'#8B4AE8', pitch:0.94, rate:0.84, voice:'慢条斯理',
             pos:[[50,50],[50,50],[50,50],[50,50]] }
 };
 
 /* 情绪修饰：让同一角色在不同句子里有抑扬顿挫，而不是一个调子念到底 */
 var TONES = {
   normal:    { pitch:1.00, rate:1.00, label:'' },
-  happy:     { pitch:1.22, rate:1.08, label:'开心' },
-  excited:   { pitch:1.38, rate:1.16, label:'兴奋' },
-  question:  { pitch:1.20, rate:0.96, label:'疑问' },
-  surprised: { pitch:1.42, rate:1.12, label:'惊讶' },
-  sad:       { pitch:0.80, rate:0.84, label:'失落' },
-  worried:   { pitch:0.94, rate:0.90, label:'担心' },
-  angry:     { pitch:1.10, rate:1.10, label:'生气' },
-  proud:     { pitch:0.96, rate:0.92, label:'得意' },
-  whisper:   { pitch:0.86, rate:0.78, label:'轻声' },
-  thinking:  { pitch:0.98, rate:0.80, label:'思考' },
-  laugh:     { pitch:1.34, rate:1.10, label:'大笑' }
+  happy:     { pitch:1.26, rate:1.09, label:'开心' },
+  excited:   { pitch:1.44, rate:1.18, label:'兴奋' },
+  question:  { pitch:1.24, rate:0.94, label:'疑问' },
+  surprised: { pitch:1.55, rate:1.20, label:'惊讶' },
+  sad:       { pitch:0.62, rate:0.74, label:'失落' },
+  worried:   { pitch:0.86, rate:0.86, label:'担心' },
+  angry:     { pitch:1.16, rate:1.22, label:'生气' },
+  proud:     { pitch:0.92, rate:0.90, label:'得意' },
+  whisper:   { pitch:0.78, rate:0.72, label:'轻声' },
+  thinking:  { pitch:0.94, rate:0.76, label:'思考' },
+  laugh:     { pitch:1.40, rate:1.16, label:'大笑' }
 };
 
 /* 显示用音高刻度：把绝对 pitch 映射成 1-10 格，让"差别大"看得见 */
@@ -428,11 +434,11 @@ function pitchScale(chKey) {
 
 /* 每个角色的情绪可用区间：高音角色向上留余量，低音角色向下留余量 */
 var PITCH_RANGE = {
-  gerald: { min: 0.20, max: 0.62 },
-  piggie: { min: 1.15, max: 1.68 },
-  snake:  { min: 1.28, max: 1.92 },
-  puppy:  { min: 1.10, max: 1.58 },
-  nah:    { min: 0.80, max: 1.28 }
+  gerald: { min: 0.14, max: 0.60 },
+  piggie: { min: 1.10, max: 1.98 },
+  snake:  { min: 1.30, max: 1.99 },
+  puppy:  { min: 1.05, max: 1.72 },
+  nah:    { min: 0.72, max: 1.26 }
 };
 
 /* 基准嗓 × 情绪 → 最终音高/语速。
@@ -442,8 +448,9 @@ function resolveVoice(chKey, toneKey) {
   var t = TONES[toneKey] || TONES.normal;
   var rng = PITCH_RANGE[chKey] || { min: 0.8, max: Math.min(1.95, ch.pitch * 1.3) };
 
-  /* 情绪强度：sad=0 → normal=0.5 → surprised=1，映射到 [min,max] */
-  var strength = (t.pitch - 0.78) / (1.42 - 0.78);
+  /* 情绪强度：sad=0 → normal≈0.5 → surprised=1，映射到 [min,max]。
+     区间按新的 TONES 范围 (0.62 → 1.55) 归一化，让"最闷/最炸"都能顶到端点。 */
+  var strength = (t.pitch - 0.62) / (1.55 - 0.62);
   if (strength < 0) strength = 0;
   if (strength > 1) strength = 1;
   /* 情绪越强，越向区间两端拉开，制造明显起伏 */
@@ -454,9 +461,10 @@ function resolveVoice(chKey, toneKey) {
   if (rate > 1.7) rate = 1.7;
   if (rate < 0.55) rate = 0.55;
 
+  /* 分段语速：慢角色起伏大、快角色起伏小；6 段比 4 段波峰更密更戏剧化 */
   var segRate;
-  if (rate <= 0.92) segRate = [rate * 0.94, rate * 1.03, rate * 0.90, rate * 0.97];
-  else segRate = [rate * 0.98, rate * 1.06, rate * 0.99, rate * 1.02];
+  if (rate <= 0.92) segRate = [rate * 0.90, rate * 1.08, rate * 0.86, rate * 1.02, rate * 0.92, rate * 1.06];
+  else segRate = [rate * 0.94, rate * 1.12, rate * 0.96, rate * 1.06, rate * 0.98, rate * 1.08];
   return { pitch: pitch, rate: rate, segRate: segRate, tone: t, strength: curve };
 }
 
@@ -464,10 +472,10 @@ function resolveVoice(chKey, toneKey) {
    插图（纯手写内联 SVG，无任何外部资源）
    ========================================================= */
 var ART = {
-  piggieL: '<svg viewBox="0 0 100 100"><circle cx="50" cy="54" r="34" fill="#F7A8C4"/><ellipse cx="32" cy="26" rx="12" ry="14" fill="#F7A8C4" transform="rotate(-18 32 26)"/><ellipse cx="68" cy="26" rx="12" ry="14" fill="#F7A8C4" transform="rotate(18 68 26)"/><ellipse cx="32" cy="26" rx="7" ry="8" fill="#FBD3E2" transform="rotate(-18 32 26)"/><ellipse cx="68" cy="26" rx="7" ry="8" fill="#FBD3E2" transform="rotate(18 68 26)"/><circle cx="38" cy="48" r="5" fill="#3A3350"/><circle cx="62" cy="48" r="5" fill="#3A3350"/><circle cx="39.8" cy="46.2" r="1.7" fill="#FFF"/><circle cx="63.8" cy="46.2" r="1.7" fill="#FFF"/><ellipse cx="50" cy="66" rx="15" ry="11" fill="#F58BB0"/><ellipse cx="44" cy="66" rx="3.4" ry="4.6" fill="#D2597F"/><ellipse cx="56" cy="66" rx="3.4" ry="4.6" fill="#D2597F"/><path d="M42 80 q8 7 16 0" stroke="#B94A6E" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="22" cy="60" r="6" fill="#F6B9CE" opacity=".85"/><circle cx="78" cy="60" r="6" fill="#F6B9CE" opacity=".85"/></svg>',
-  geraldL: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="56" rx="35" ry="32" fill="#8FC9EC"/><ellipse cx="16" cy="52" rx="15" ry="19" fill="#8FC9EC"/><ellipse cx="84" cy="52" rx="15" ry="19" fill="#8FC9EC"/><ellipse cx="16" cy="52" rx="9" ry="12" fill="#B3DCF5"/><ellipse cx="84" cy="52" rx="9" ry="12" fill="#B3DCF5"/><circle cx="38" cy="48" r="5.4" fill="#2E4560"/><circle cx="62" cy="48" r="5.4" fill="#2E4560"/><circle cx="39.8" cy="46.2" r="1.8" fill="#FFF"/><circle cx="63.8" cy="46.2" r="1.8" fill="#FFF"/><path d="M50 60 q-8 6 -14 2 q-4 5 -2 10 q6 5 16 -1 q10 6 16 1 q2 -5 -2 -10 q-6 4 -14 -2 z" fill="#6FB2DC"/><path d="M50 63 q-6 4 -11 1" stroke="#4E8FBB" stroke-width="1.6" fill="none"/><path d="M50 63 q6 4 11 1" stroke="#4E8FBB" stroke-width="1.6" fill="none"/><path d="M30 20 q6 -10 12 -3 q5 -9 11 -1" stroke="#8FC9EC" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/><path d="M70 20 q-6 -10 -12 -3 q-5 -9 -11 -1" stroke="#8FC9EC" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/></svg>',
-  snakeL: '<svg viewBox="0 0 100 100"><path d="M18 82 q22 0 22 -18 q0 -16 20 -16 q22 0 22 -18 q0 -10 -12 -10" stroke="#7CCB93" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="70" cy="20" r="14" fill="#7CCB93"/><circle cx="65" cy="17" r="3.2" fill="#2E4B36"/><circle cx="75" cy="17" r="3.2" fill="#2E4B36"/><circle cx="65.8" cy="15.8" r="1.1" fill="#FFF"/><circle cx="75.8" cy="15.8" r="1.1" fill="#FFF"/><path d="M64 26 q6 5 12 0" stroke="#3F7A52" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M76 30 l6 6 m-2 -8 l7 3" stroke="#E8506E" stroke-width="2.2" stroke-linecap="round"/><circle cx="30" cy="70" r="3" fill="#A5DEB5"/><circle cx="44" cy="52" r="3" fill="#A5DEB5"/><circle cx="58" cy="40" r="3" fill="#A5DEB5"/></svg>',
-  puppyL: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="31" ry="30" fill="#E8C48A"/><ellipse cx="22" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(-14 22 40)"/><ellipse cx="78" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(14 78 40)"/><circle cx="39" cy="50" r="5" fill="#3A3350"/><circle cx="61" cy="50" r="5" fill="#3A3350"/><circle cx="40.6" cy="48.4" r="1.6" fill="#FFF"/><circle cx="62.6" cy="48.4" r="1.6" fill="#FFF"/><ellipse cx="50" cy="66" rx="13" ry="10" fill="#F5DFB8"/><ellipse cx="50" cy="62" rx="5" ry="3.6" fill="#3A3350"/><path d="M50 66 v5 m0 0 q-5 4 -9 0 m9 0 q5 4 9 0" stroke="#8A6A38" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="27" cy="62" rx="6" ry="4" fill="#F7B6C4" opacity=".7"/><ellipse cx="73" cy="62" rx="6" ry="4" fill="#F7B6C4" opacity=".7"/></svg>',
+  piggieL: '<svg viewBox="0 0 100 100"><circle cx="50" cy="52" r="39" fill="#FF9DC4" stroke="#8C2E50" stroke-width="2.6"/><ellipse cx="20" cy="20" rx="13" ry="16" fill="#FF9DC4" stroke="#8C2E50" stroke-width="2.4" transform="rotate(-24 20 20)"/><ellipse cx="80" cy="20" rx="13" ry="16" fill="#FF9DC4" stroke="#8C2E50" stroke-width="2.4" transform="rotate(24 80 20)"/><ellipse cx="20" cy="20" rx="8" ry="10" fill="#FFD0E0" transform="rotate(-24 20 20)"/><ellipse cx="80" cy="20" rx="8" ry="10" fill="#FFD0E0" transform="rotate(24 80 20)"/><circle cx="34" cy="46" r="8" fill="#FFF" stroke="#3A2432" stroke-width="1.6"/><circle cx="66" cy="46" r="8" fill="#FFF" stroke="#3A2432" stroke-width="1.6"/><circle cx="36" cy="47" r="4.6" fill="#2A1822"/><circle cx="64" cy="47" r="4.6" fill="#2A1822"/><circle cx="37.8" cy="45.4" r="1.9" fill="#FFF"/><circle cx="65.8" cy="45.4" r="1.9" fill="#FFF"/><ellipse cx="50" cy="68" rx="18" ry="13" fill="#FF7FAC" stroke="#8C2E50" stroke-width="2"/><ellipse cx="42" cy="68" rx="4" ry="5.4" fill="#8E2E50"/><ellipse cx="58" cy="68" rx="4" ry="5.4" fill="#8E2E50"/><path d="M40 82 q10 10 20 0" stroke="#8C2E50" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="16" cy="60" r="7" fill="#FFB3D0" opacity=".9"/><circle cx="84" cy="60" r="7" fill="#FFB3D0" opacity=".9"/><ellipse cx="24" cy="72" rx="4" ry="2.4" fill="#FFC9DD" opacity=".7"/><ellipse cx="76" cy="72" rx="4" ry="2.4" fill="#FFC9DD" opacity=".7"/></svg>',
+  geraldL: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="56" rx="39" ry="34" fill="#9AD5F0" stroke="#1E5F88" stroke-width="2.6"/><ellipse cx="10" cy="48" rx="15" ry="20" fill="#9AD5F0" stroke="#1E5F88" stroke-width="2.4"/><ellipse cx="90" cy="48" rx="15" ry="20" fill="#9AD5F0" stroke="#1E5F88" stroke-width="2.4"/><ellipse cx="10" cy="48" rx="9" ry="13" fill="#C7E6F7"/><ellipse cx="90" cy="48" rx="9" ry="13" fill="#C7E6F7"/><circle cx="34" cy="42" r="8" fill="#FFF" stroke="#1B3D54" stroke-width="1.6"/><circle cx="66" cy="42" r="8" fill="#FFF" stroke="#1B3D54" stroke-width="1.6"/><circle cx="36" cy="43" r="4.6" fill="#1E3B52"/><circle cx="64" cy="43" r="4.6" fill="#1E3B52"/><circle cx="37.8" cy="41.4" r="1.9" fill="#FFF"/><circle cx="65.8" cy="41.4" r="1.9" fill="#FFF"/><path d="M50 60 q-12 8 -19 2 q-5 6 -2 13 q8 6 21 -3 q13 9 21 3 q3 -7 -2 -13 q-7 6 -19 -2 z" fill="#78BEE0" stroke="#1E5F88" stroke-width="2"/><path d="M50 64 q-7 5 -14 1" stroke="#1E5F88" stroke-width="1.6" fill="none"/><path d="M50 64 q7 5 14 1" stroke="#1E5F88" stroke-width="1.6" fill="none"/><ellipse cx="20" cy="60" rx="6" ry="3.4" fill="#6FB9DE" opacity=".7"/><ellipse cx="80" cy="60" rx="6" ry="3.4" fill="#6FB9DE" opacity=".7"/><path d="M26 18 q8 -13 16 -4 q7 -12 16 -1" stroke="#7ABDE0" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M74 18 q-8 -13 -16 -4 q-7 -12 -16 -1" stroke="#7ABDE0" stroke-width="4" fill="none" stroke-linecap="round"/></svg>',
+  snakeL: '<svg viewBox="0 0 100 100"><path d="M16 90 q20 -6 18 -26 q-2 -22 22 -22 q26 0 24 -22 q-2 -12 -14 -12" stroke="#6FCF8A" stroke-width="15" fill="none" stroke-linecap="round"/><path d="M16 90 q20 -6 18 -26 q-2 -22 22 -22 q26 0 24 -22 q-2 -12 -14 -12" stroke="#2E7C45" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".7"/><circle cx="76" cy="18" r="16" fill="#6FCF8A" stroke="#2E7C45" stroke-width="2.4"/><circle cx="70" cy="15" r="4" fill="#FFF" stroke="#1E3B2A" stroke-width="1.3"/><circle cx="82" cy="15" r="4" fill="#FFF" stroke="#1E3B2A" stroke-width="1.3"/><circle cx="70.6" cy="15.6" r="2" fill="#1E3B2A"/><circle cx="82.6" cy="15.6" r="2" fill="#1E3B2A"/><circle cx="71.2" cy="14.6" r=".8" fill="#FFF"/><circle cx="83.2" cy="14.6" r=".8" fill="#FFF"/><path d="M68 24 q8 7 16 0" stroke="#2E7C45" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M84 28 l7 6 M85 26 l8 2" stroke="#E8506E" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="24" cy="76" rx="5" ry="3.4" fill="#A5E0B8" transform="rotate(-20 24 76)"/><ellipse cx="40" cy="54" rx="5" ry="3.4" fill="#A5E0B8" transform="rotate(20 40 54)"/><ellipse cx="58" cy="38" rx="5" ry="3.4" fill="#A5E0B8" transform="rotate(-20 58 38)"/></svg>',
+  puppyL: '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="58" rx="34" ry="31" fill="#E8C48A" stroke="#7A5A2A" stroke-width="2.6"/><ellipse cx="18" cy="36" rx="13" ry="22" fill="#C9A066" stroke="#7A5A2A" stroke-width="2.4" transform="rotate(-16 18 36)"/><ellipse cx="82" cy="36" rx="13" ry="22" fill="#C9A066" stroke="#7A5A2A" stroke-width="2.4" transform="rotate(16 82 36)"/><ellipse cx="18" cy="36" rx="7" ry="13" fill="#E8C48A" transform="rotate(-16 18 36)"/><ellipse cx="82" cy="36" rx="7" ry="13" fill="#E8C48A" transform="rotate(16 82 36)"/><circle cx="36" cy="50" r="8" fill="#FFF" stroke="#3A2A14" stroke-width="1.6"/><circle cx="64" cy="50" r="8" fill="#FFF" stroke="#3A2A14" stroke-width="1.6"/><circle cx="38" cy="51" r="4.6" fill="#2A1E10"/><circle cx="62" cy="51" r="4.6" fill="#2A1E10"/><circle cx="39.8" cy="49.4" r="1.9" fill="#FFF"/><circle cx="63.8" cy="49.4" r="1.9" fill="#FFF"/><ellipse cx="50" cy="70" rx="14" ry="11" fill="#F5E0B8" stroke="#7A5A2A" stroke-width="2"/><ellipse cx="50" cy="65" rx="5.4" ry="4" fill="#3A2A14"/><path d="M50 70 v6 M50 76 q-6 5 -11 0 M50 76 q6 5 11 0" stroke="#7A5A2A" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="22" cy="62" rx="6" ry="3.6" fill="#FFC9A6" opacity=".8"/><ellipse cx="78" cy="62" rx="6" ry="3.6" fill="#FFC9A6" opacity=".8"/></svg>',
   busL: '<svg viewBox="0 0 100 100"><rect x="12" y="26" width="76" height="48" rx="10" fill="#FFD567"/><rect x="20" y="34" width="24" height="18" rx="4" fill="#BEE6FA"/><rect x="50" y="34" width="30" height="18" rx="4" fill="#BEE6FA"/><rect x="12" y="58" width="76" height="7" fill="#E0AE33"/><circle cx="28" cy="76" r="8" fill="#4A4258"/><circle cx="72" cy="76" r="8" fill="#4A4258"/><circle cx="28" cy="76" r="3" fill="#B9B2C7"/><circle cx="72" cy="76" r="3" fill="#B9B2C7"/><path d="M84 40 h6" stroke="#E8506E" stroke-width="4" stroke-linecap="round"/></svg>',
   ballL: '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="32" fill="#F4707C"/><path d="M18 50 q32 -14 64 0" stroke="#FFF" stroke-width="5" fill="none"/><path d="M50 18 q-14 32 0 64" stroke="#FFF" stroke-width="5" fill="none"/><circle cx="50" cy="50" r="32" fill="none" stroke="#D3455A" stroke-width="3"/></svg>',
   iceL:  '<svg viewBox="0 0 100 100"><path d="M38 26 L62 26 L56 82 Q50 88 44 82 Z" fill="#FFE0B2"/><path d="M40 16 q-8 -12 -2 -16" stroke="#F0C08A" stroke-width="3" fill="none"/><circle cx="50" cy="20" r="15" fill="#F7A8C4"/><circle cx="50" cy="14" r="11" fill="#FBD3E2"/><circle cx="45" cy="19" r="2" fill="#D2597F"/><circle cx="55" cy="19" r="2" fill="#D2597F"/><path d="M46 26 q4 4 8 0" stroke="#D2597F" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="34" y="30" width="32" height="5" rx="2" fill="#E8B87E"/></svg>',
@@ -716,7 +724,24 @@ var $ = function (id) { return document.getElementById(id); };
 /* =========================================================
    音色分配：同一角色始终用同一音色，音高/语速按角色档案设定
    ========================================================= */
+/* =========================================================
+   音色分配：同一角色始终用同一音色，音色按角色档案挑选
+   优先级：Samantha / Aria / Zira（Windows 引擎，卡通感强、pitch 响应好）
+         > 其他女声 > 男声（Google 系作为最末兜底，pitch 控制较弱）
+   ========================================================= */
 var voicePool = { female: [], male: [] };
+var VOICE_PRIORITY = {
+  'samantha': 0, 'aria': 1, 'zira': 2, 'female': 3, 'jenny': 4, 'karen': 5, 'michelle': 6,
+  'catherine': 7, 'allison': 8, 'susan': 9, 'victoria': 10, 'moira': 11, 'fiona': 12,
+  'tessa': 13, 'serena': 14, 'ava': 15, 'google us english': 90,
+  'david': 20, 'mark': 21, 'guy': 22, 'daniel': 23, 'arthur': 24, 'rishi': 25, 'fred': 26,
+  'male': 30, 'google uk english male': 90, 'tom': 91, 'oliver': 91, 'alex': 92
+};
+function voiceScore(v) {
+  var n = (v.name || '').toLowerCase();
+  for (var k in VOICE_PRIORITY) { if (n.indexOf(k) >= 0) return VOICE_PRIORITY[k]; }
+  return 100;
+}
 function loadVoices() {
   if (!synth) return;
   var vs = synth.getVoices() || [];
@@ -724,12 +749,11 @@ function loadVoices() {
   vs.forEach(function (v) {
     if (!/^en/i.test(v.lang)) return;
     var n = (v.name || '').toLowerCase();
-    if (/female|samantha|zira|aria|jenny|michelle|karen|moira|tessa|victoria|fiona|susan|google us english|allison|ava|serena/.test(n)) voicePool.female.push(v);
-    else if (/male|david|mark|guy|alex|daniel|fred|google uk english male|rishi|arthur|oliver|tom/.test(n)) voicePool.male.push(v);
+    if (/male|david|mark|guy|alex|daniel|fred|google uk english male|rishi|arthur|oliver|tom/.test(n)) voicePool.male.push(v);
     else voicePool.female.push(v);
   });
-  voicePool.female = uniqBy(voicePool.female);
-  voicePool.male = uniqBy(voicePool.male);
+  voicePool.female = uniqBy(voicePool.female).sort(function (a, b) { return voiceScore(a) - voiceScore(b); });
+  voicePool.male = uniqBy(voicePool.male).sort(function (a, b) { return voiceScore(a) - voiceScore(b); });
 }
 function uniqBy(arr) {
   var seen = {}, out = [];
@@ -787,11 +811,11 @@ function speak(text, whoKey, opts) {
     var isLast = i === segs.length - 1;
     var u = new SpeechSynthesisUtterance(trimPunct(seg) + (/[?!]$/.test(seg) ? '?' : '.'));
     u.lang = 'en-US';
-    /* 分段内部的音高与语速落差，制造起伏 */
-    var wave = i % 2 === 0 ? 1.0 : 0.93;
+    /* 分段内部的音高与语速落差，制造起伏（6 段波形，上下幅度比 v5 更大） */
+    var wave = [1.06, 0.90, 1.05, 0.92, 1.04, 0.93][i % 6];
     var p = vp.pitch * wave;
     var r = vp.segRate[i % vp.segRate.length];
-    if (isLast && /[?!]$/.test(String(seg))) { p *= 1.06; }
+    if (isLast && /[?!]$/.test(String(seg))) { p *= 1.10; }   /* 句尾上扬更明显 */
     u.pitch = Math.max(0.1, Math.min(2, p));
     u.rate = Math.max(0.55, Math.min(1.7, r));
     u.volume = 1;
@@ -952,12 +976,11 @@ function stagePair(talking) {
 
 /* 角色专属立绘（去掉外层 svg 包装，供场景内复用） */
 var FIG = {
-  piggie: '<circle cx="50" cy="54" r="34" fill="#F7A8C4"/><ellipse cx="32" cy="26" rx="12" ry="14" fill="#F7A8C4" transform="rotate(-18 32 26)"/><ellipse cx="68" cy="26" rx="12" ry="14" fill="#F7A8C4" transform="rotate(18 68 26)"/><ellipse cx="32" cy="26" rx="7" ry="8" fill="#FBD3E2" transform="rotate(-18 32 26)"/><ellipse cx="68" cy="26" rx="7" ry="8" fill="#FBD3E2" transform="rotate(18 68 26)"/><circle cx="38" cy="48" r="5" fill="#3A3350"/><circle cx="62" cy="48" r="5" fill="#3A3350"/><circle cx="39.8" cy="46.2" r="1.7" fill="#FFF"/><circle cx="63.8" cy="46.2" r="1.7" fill="#FFF"/><ellipse cx="50" cy="66" rx="15" ry="11" fill="#F58BB0"/><ellipse cx="44" cy="66" rx="3.4" ry="4.6" fill="#D2597F"/><ellipse cx="56" cy="66" rx="3.4" ry="4.6" fill="#D2597F"/><path d="M44 79 q6 6 12 0" stroke="#B94A6E" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="22" cy="60" r="6" fill="#F6B9CE" opacity=".85"/><circle cx="78" cy="60" r="6" fill="#F6B9CE" opacity=".85"/>',
-  gerald: '<ellipse cx="50" cy="58" rx="35" ry="31" fill="#8FC9EC"/><ellipse cx="15" cy="50" rx="15" ry="19" fill="#8FC9EC"/><ellipse cx="85" cy="50" rx="15" ry="19" fill="#8FC9EC"/><ellipse cx="15" cy="50" rx="9" ry="12" fill="#B3DCF5"/><ellipse cx="85" cy="50" rx="9" ry="12" fill="#B3DCF5"/><circle cx="37" cy="44" r="5.4" fill="#2E4560"/><circle cx="63" cy="44" r="5.4" fill="#2E4560"/><circle cx="38.8" cy="42.2" r="1.8" fill="#FFF"/><circle cx="64.8" cy="42.2" r="1.8" fill="#FFF"/><path d="M50 56 q-9 7 -15 3 q-5 5 -2 11 q7 5 17 -2 q10 7 17 2 q3 -6 -2 -11 q-6 4 -15 -3 z" fill="#6FB2DC"/><path d="M50 60 q-6 4 -11 1" stroke="#4E8FBB" stroke-width="1.6" fill="none"/><path d="M50 60 q6 4 11 1" stroke="#4E8FBB" stroke-width="1.6" fill="none"/><path d="M28 24 q7 -12 14 -4 q6 -11 13 -1" stroke="#8FC9EC" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/><path d="M72 24 q-7 -12 -14 -4 q-6 -11 -13 -1" stroke="#8FC9EC" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/>',
-  snake: '<path d="M20 84 q22 0 22 -18 q0 -16 20 -16 q22 0 22 -18 q0 -10 -12 -10" stroke="#7CCB93" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="70" cy="22" r="15" fill="#7CCB93"/><circle cx="65" cy="19" r="3.4" fill="#2E4B36"/><circle cx="75" cy="19" r="3.4" fill="#2E4B36"/><circle cx="65.9" cy="17.8" r="1.2" fill="#FFF"/><circle cx="75.9" cy="17.8" r="1.2" fill="#FFF"/><path d="M64 29 q6 5 12 0" stroke="#3F7A52" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M77 33 l6 6 m-2 -9 l8 4" stroke="#E8506E" stroke-width="2.2" stroke-linecap="round"/><circle cx="32" cy="72" r="3" fill="#A5DEB5"/><circle cx="46" cy="54" r="3" fill="#A5DEB5"/><circle cx="60" cy="42" r="3" fill="#A5DEB5"/>',
-  puppy: '<ellipse cx="50" cy="55" rx="31" ry="30" fill="#E8C48A"/><ellipse cx="22" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(-14 22 40)"/><ellipse cx="78" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(14 78 40)"/><circle cx="39" cy="50" r="5" fill="#3A3350"/><circle cx="61" cy="50" r="5" fill="#3A3350"/><circle cx="40.6" cy="48.4" r="1.6" fill="#FFF"/><circle cx="62.6" cy="48.4" r="1.6" fill="#FFF"/><ellipse cx="50" cy="66" rx="13" ry="10" fill="#F5DFB8"/><ellipse cx="50" cy="62" rx="5" ry="3.6" fill="#3A3350"/><path d="M50 66 v5 m0 0 q-5 4 -9 0 m9 0 q5 4 9 0" stroke="#8A6A38" stroke-width="2" fill="none" stroke-linecap="round"/>'
+  piggie: '<circle cx="50" cy="52" r="39" fill="#FF9DC4" stroke="#8C2E50" stroke-width="2.6"/><ellipse cx="20" cy="20" rx="13" ry="16" fill="#FF9DC4" stroke="#8C2E50" stroke-width="2.4" transform="rotate(-24 20 20)"/><ellipse cx="80" cy="20" rx="13" ry="16" fill="#FF9DC4" stroke="#8C2E50" stroke-width="2.4" transform="rotate(24 80 20)"/><ellipse cx="20" cy="20" rx="8" ry="10" fill="#FFD0E0" transform="rotate(-24 20 20)"/><ellipse cx="80" cy="20" rx="8" ry="10" fill="#FFD0E0" transform="rotate(24 80 20)"/><circle cx="34" cy="46" r="8" fill="#FFF" stroke="#3A2432" stroke-width="1.6"/><circle cx="66" cy="46" r="8" fill="#FFF" stroke="#3A2432" stroke-width="1.6"/><circle cx="36" cy="47" r="4.6" fill="#2A1822"/><circle cx="64" cy="47" r="4.6" fill="#2A1822"/><circle cx="37.8" cy="45.4" r="1.9" fill="#FFF"/><circle cx="65.8" cy="45.4" r="1.9" fill="#FFF"/><ellipse cx="50" cy="68" rx="18" ry="13" fill="#FF7FAC" stroke="#8C2E50" stroke-width="2"/><ellipse cx="42" cy="68" rx="4" ry="5.4" fill="#8E2E50"/><ellipse cx="58" cy="68" rx="4" ry="5.4" fill="#8E2E50"/><path d="M40 82 q10 10 20 0" stroke="#8C2E50" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="16" cy="60" r="7" fill="#FFB3D0" opacity=".9"/><circle cx="84" cy="60" r="7" fill="#FFB3D0" opacity=".9"/><ellipse cx="24" cy="72" rx="4" ry="2.4" fill="#FFC9DD" opacity=".7"/><ellipse cx="76" cy="72" rx="4" ry="2.4" fill="#FFC9DD" opacity=".7"/>',
+  gerald: '<ellipse cx="50" cy="56" rx="39" ry="34" fill="#9AD5F0" stroke="#1E5F88" stroke-width="2.6"/><ellipse cx="10" cy="48" rx="15" ry="20" fill="#9AD5F0" stroke="#1E5F88" stroke-width="2.4"/><ellipse cx="90" cy="48" rx="15" ry="20" fill="#9AD5F0" stroke="#1E5F88" stroke-width="2.4"/><ellipse cx="10" cy="48" rx="9" ry="13" fill="#C7E6F7"/><ellipse cx="90" cy="48" rx="9" ry="13" fill="#C7E6F7"/><circle cx="34" cy="42" r="8" fill="#FFF" stroke="#1B3D54" stroke-width="1.6"/><circle cx="66" cy="42" r="8" fill="#FFF" stroke="#1B3D54" stroke-width="1.6"/><circle cx="36" cy="43" r="4.6" fill="#1E3B52"/><circle cx="64" cy="43" r="4.6" fill="#1E3B52"/><circle cx="37.8" cy="41.4" r="1.9" fill="#FFF"/><circle cx="65.8" cy="41.4" r="1.9" fill="#FFF"/><path d="M50 60 q-12 8 -19 2 q-5 6 -2 13 q8 6 21 -3 q13 9 21 3 q3 -7 -2 -13 q-7 6 -19 -2 z" fill="#78BEE0" stroke="#1E5F88" stroke-width="2"/><path d="M50 64 q-7 5 -14 1" stroke="#1E5F88" stroke-width="1.6" fill="none"/><path d="M50 64 q7 5 14 1" stroke="#1E5F88" stroke-width="1.6" fill="none"/><ellipse cx="20" cy="60" rx="6" ry="3.4" fill="#6FB9DE" opacity=".7"/><ellipse cx="80" cy="60" rx="6" ry="3.4" fill="#6FB9DE" opacity=".7"/><path d="M26 18 q8 -13 16 -4 q7 -12 16 -1" stroke="#7ABDE0" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M74 18 q-8 -13 -16 -4 q-7 -12 -16 -1" stroke="#7ABDE0" stroke-width="4" fill="none" stroke-linecap="round"/>',
+  snake: '<path d="M16 90 q20 -6 18 -26 q-2 -22 22 -22 q26 0 24 -22 q-2 -12 -14 -12" stroke="#6FCF8A" stroke-width="15" fill="none" stroke-linecap="round"/><path d="M16 90 q20 -6 18 -26 q-2 -22 22 -22 q26 0 24 -22 q-2 -12 -14 -12" stroke="#2E7C45" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".7"/><circle cx="76" cy="18" r="16" fill="#6FCF8A" stroke="#2E7C45" stroke-width="2.4"/><circle cx="70" cy="15" r="4" fill="#FFF" stroke="#1E3B2A" stroke-width="1.3"/><circle cx="82" cy="15" r="4" fill="#FFF" stroke="#1E3B2A" stroke-width="1.3"/><circle cx="70.6" cy="15.6" r="2" fill="#1E3B2A"/><circle cx="82.6" cy="15.6" r="2" fill="#1E3B2A"/><circle cx="71.2" cy="14.6" r=".8" fill="#FFF"/><circle cx="83.2" cy="14.6" r=".8" fill="#FFF"/><path d="M68 24 q8 7 16 0" stroke="#2E7C45" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M84 28 l7 6 M85 26 l8 2" stroke="#E8506E" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="24" cy="76" rx="5" ry="3.4" fill="#A5E0B8" transform="rotate(-20 24 76)"/><ellipse cx="40" cy="54" rx="5" ry="3.4" fill="#A5E0B8" transform="rotate(20 40 54)"/><ellipse cx="58" cy="38" rx="5" ry="3.4" fill="#A5E0B8" transform="rotate(-20 58 38)"/>',
+  puppy: '<ellipse cx="50" cy="58" rx="34" ry="31" fill="#E8C48A" stroke="#7A5A2A" stroke-width="2.6"/><ellipse cx="18" cy="36" rx="13" ry="22" fill="#C9A066" stroke="#7A5A2A" stroke-width="2.4" transform="rotate(-16 18 36)"/><ellipse cx="82" cy="36" rx="13" ry="22" fill="#C9A066" stroke="#7A5A2A" stroke-width="2.4" transform="rotate(16 82 36)"/><ellipse cx="18" cy="36" rx="7" ry="13" fill="#E8C48A" transform="rotate(-16 18 36)"/><ellipse cx="82" cy="36" rx="7" ry="13" fill="#E8C48A" transform="rotate(16 82 36)"/><circle cx="36" cy="50" r="8" fill="#FFF" stroke="#3A2A14" stroke-width="1.6"/><circle cx="64" cy="50" r="8" fill="#FFF" stroke="#3A2A14" stroke-width="1.6"/><circle cx="38" cy="51" r="4.6" fill="#2A1E10"/><circle cx="62" cy="51" r="4.6" fill="#2A1E10"/><circle cx="39.8" cy="49.4" r="1.9" fill="#FFF"/><circle cx="63.8" cy="49.4" r="1.9" fill="#FFF"/><ellipse cx="50" cy="70" rx="14" ry="11" fill="#F5E0B8" stroke="#7A5A2A" stroke-width="2"/><ellipse cx="50" cy="65" rx="5.4" ry="4" fill="#3A2A14"/><path d="M50 70 v6 M50 76 q-6 5 -11 0 M50 76 q6 5 11 0" stroke="#7A5A2A" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="22" cy="62" rx="6" ry="3.6" fill="#FFC9A6" opacity=".8"/><ellipse cx="78" cy="62" rx="6" ry="3.6" fill="#FFC9A6" opacity=".8"/>'
 };
-
 /* #RGB/#RRGGBB → rgba()，用于气泡描边与光晕 */
 function hexA(hex, a) {
   var h = String(hex).replace('#', '');

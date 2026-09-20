@@ -65,25 +65,74 @@ body{
 
 /* 舞台 / 插图 */
 .stage{position:relative;border-radius:22px;overflow:hidden;background:var(--scene-bg,#EAF2FF);margin-bottom:14px;
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.6)}
-.stage svg{display:block;width:100%;height:auto}
-.stage .caption{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(30,20,50,.62),rgba(30,20,50,0));
-  color:#FFF;font-size:13px;font-weight:700;padding:22px 14px 10px;text-shadow:0 1px 3px rgba(0,0,0,.4)}
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.6);min-height:320px;cursor:pointer}
+.stage svg.bg{display:block;width:100%;height:auto;position:absolute;inset:0;height:100%;object-fit:cover}
+.stage .caption{position:absolute;left:0;right:0;top:0;background:linear-gradient(to bottom,rgba(30,20,50,.55),rgba(30,20,50,0));
+  color:#FFF;font-size:12.5px;font-weight:700;padding:10px 14px 20px;text-shadow:0 1px 3px rgba(0,0,0,.4);z-index:3}
+.stage .tap-hint{position:absolute;right:10px;bottom:8px;font-size:11px;font-weight:700;color:#5B5170;
+  background:rgba(255,255,255,.82);padding:3px 9px;border-radius:10px;z-index:3}
 
-/* 台词 */
-.line-list{display:grid;gap:8px}
-.line{display:flex;gap:10px;align-items:flex-start;background:#FBF9FF;border-radius:16px;padding:10px 12px;cursor:pointer;
-  border:2px solid transparent;transition:transform .14s,border-color .14s,background .14s}
-.line:hover{transform:translateX(4px);border-color:#EDE7F6}
-.line:active{transform:scale(.985)}
-.line.speaking{border-color:var(--pri);background:var(--pri-l);box-shadow:0 4px 14px rgba(166,108,255,.18)}
-.line .avatar{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:#FFF;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 6px rgba(94,70,150,.12)}
-.line .body{flex:1;min-width:0}
-.line .who{font-size:11px;font-weight:800;color:var(--line-accent,#8B4AE8);letter-spacing:.3px;text-transform:uppercase}
-.line .en{font-size:16px;font-weight:800;color:var(--txt);line-height:1.35;margin-top:1px}
-.line .cn{font-size:12px;color:var(--tx2);margin-top:2px}
-.line .spk{margin-left:6px;font-size:16px;opacity:.45;flex:0 0 auto;align-self:center}
-.line.speaking .spk{opacity:1}
+/* 场景人物 + 贴身旁白（漫画分镜） */
+.stage .figure{position:absolute;transform:translate(-50%,-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:5px}
+.stage .figure .art{width:var(--fw,92px);height:var(--fw,92px);pointer-events:none;
+  filter:drop-shadow(0 6px 10px rgba(40,25,70,.18))}
+.stage .figure .art svg{width:100%;height:100%;display:block}
+.stage .figure .art.inv svg{transform:scaleX(-1)}
+.stage .fig-bub{position:relative;max-width:150px;background:#FFF;border-radius:14px;padding:8px 11px;
+  box-shadow:0 6px 18px rgba(70,45,120,.18);border:2.5px solid var(--c-accent,#A66CFF);
+  cursor:pointer;transition:transform .16s,box-shadow .16s}
+.stage .fig-bub::after{content:'';position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
+  width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
+  border-top:9px solid var(--c-accent,#A66CFF)}
+.stage .fig-bub::before{content:'';position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid #FFF;z-index:1}
+.stage .fig-bub:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 24px rgba(70,45,120,.26)}
+.stage .fig-bub:active{transform:scale(.96)}
+.stage .fig-name{font-size:9.5px;font-weight:800;color:var(--c-accent,#A66CFF);letter-spacing:.4px;
+  text-transform:uppercase;margin-bottom:1px}
+.stage .fig-en{font-size:13px;font-weight:800;line-height:1.28;color:#2B2440}
+.stage .fig-cn{font-size:10.5px;color:#7B7392;margin-top:3px;line-height:1.3}
+.stage .figure.active .art{animation:bob .85s ease-in-out infinite}
+.stage .figure.active .fig-bub{box-shadow:0 0 0 4px var(--c-glow,rgba(166,108,255,.42)),0 8px 22px rgba(70,45,120,.24);transform:translateY(-3px)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.stage .figure.active .art{animation:none}}
+
+/* 台词：人物 + 贴身旁白（纵向剧本流） */
+.sc-divider{margin:16px 0 10px;font-size:12px;font-weight:800;color:var(--tx2);letter-spacing:1.5px;
+  display:flex;align-items:center;gap:10px}
+.sc-divider::before,.sc-divider::after{content:'';height:1px;background:#EDE7F6;flex:1}
+.line-list{display:grid;gap:10px}
+.line{display:flex;gap:9px;align-items:flex-start;cursor:pointer;transition:transform .16s}
+.line.right{flex-direction:row-reverse}
+.line .avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:#FFF;font-size:21px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 9px rgba(94,70,150,.14)}
+.line .bub{position:relative;flex:1;min-width:0;background:#FFF;border-radius:16px;padding:9px 12px 10px;
+  border:2.5px solid var(--line-accent,#A66CFF);box-shadow:0 4px 12px rgba(94,70,150,.08);transition:box-shadow .16s}
+.line .bub::after{content:'';position:absolute;top:13px;width:0;height:0;
+  border-top:8px solid transparent;border-bottom:8px solid transparent}
+.line.left .bub::after{left:-9px;border-right:9px solid var(--line-accent,#A66CFF)}
+.line.right .bub::after{right:-9px;border-left:9px solid var(--line-accent,#A66CFF)}
+.line:hover .bub{box-shadow:0 8px 20px rgba(94,70,150,.15)}
+.line:active{transform:scale(.99)}
+.line.speaking .bub{box-shadow:0 0 0 4px var(--line-glow,rgba(166,108,255,.3)),0 8px 20px rgba(94,70,150,.14)}
+.bub-top{display:flex;align-items:center;gap:7px;margin-bottom:2px}
+.bub-top .who{font-size:11px;font-weight:800;color:var(--line-accent,#8B4AE8);letter-spacing:.4px;text-transform:uppercase}
+.bub-top .tone{font-size:10px;font-weight:700;padding:1px 7px;border-radius:9px}
+.bub-top .spk{margin-left:auto;font-size:14px;opacity:.4}
+.line.speaking .bub-top .spk{opacity:1}
+.line .en{font-size:16px;font-weight:800;color:var(--txt);line-height:1.35}
+.line .cn{font-size:12px;color:var(--tx2);margin-top:3px}
+.line.right .bub-top{flex-direction:row-reverse}
+.line.right .bub-top .spk{margin-left:0;margin-right:auto}
+.line.right .en,.line.right .cn{text-align:right}
+/* 音色对照表 */
+.voice-table{display:grid;gap:7px;margin-top:12px}
+.vt-row{display:flex;align-items:center;gap:10px;background:#FBF9FF;border-radius:12px;padding:8px 11px}
+.vt-row .vn{font-size:13px;font-weight:800;width:82px;flex:0 0 82px}
+.vt-row .vbar{flex:1;height:9px;border-radius:5px;background:#EDE7F6;overflow:hidden;position:relative}
+.vt-row .vbar i{position:absolute;top:0;bottom:0;border-radius:5px;display:block}
+.vt-row .vt{font-size:11px;color:var(--tx2);width:78px;flex:0 0 78px;text-align:right}
 
 /* 按钮 */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:11px 20px;border-radius:14px;border:none;cursor:pointer;
@@ -296,12 +345,76 @@ video#preview{width:100%;max-width:420px;border-radius:16px;background:#241E33;m
    角色档案（决定音色高低快慢）
    ========================================================= */
 var CHARACTERS = {
-  piggie: { name:'Piggie', cn:'小猪',  em:'🐷', bg:'#FCE4EC', accent:'#E8709A', pitch:1.55, rate:1.08, voice:'女' },
-  gerald: { name:'Gerald', cn:'小象',  em:'🐘', bg:'#E3F2FD', accent:'#3E9AD4', pitch:0.55, rate:0.82, voice:'低音' },
-  snake:  { name:'Snake',  cn:'小蛇',  em:'🐍', bg:'#E8F5E9', accent:'#4CAF7D', pitch:1.85, rate:1.22, voice:'尖细' },
-  puppy:  { name:'Puppy',  cn:'小狗',  em:'🐶', bg:'#FFF8E1', accent:'#D3A017', pitch:1.30, rate:1.05, voice:'明亮' },
-  nah:    { name:'Narrator', cn:'旁白', em:'📖', bg:'#F1E9FF', accent:'#8B4AE8', pitch:1.00, rate:0.88, voice:'叙述' }
+  /* pitch/rate 为角色的"基准嗓"；每一句还会叠加 line.tone 的情绪修饰。
+     基准音高的上限刻意留在 1.50 —— 这样"兴奋/惊讶"还能继续往上走，
+     否则 highest 情绪会被 Web Speech 的 2.0 上限压成一条平线。 */
+  piggie: { name:'Piggie', cn:'小猪',  em:'🐷', bg:'#FCE4EC', accent:'#E8709A', pitch:1.50, rate:1.06, voice:'清脆高音',
+            pos:[[30,54],[66,50],[46,52],[70,54]] },
+  gerald: { name:'Gerald', cn:'小象',  em:'🐘', bg:'#E3F2FD', accent:'#3E9AD4', pitch:0.32, rate:0.80, voice:'低沉慢速',
+            pos:[[34,56],[70,52],[50,54],[32,54]] },
+  snake:  { name:'Snake',  cn:'小蛇',  em:'🐍', bg:'#E8F5E9', accent:'#4CAF7D', pitch:1.62, rate:1.24, voice:'尖细快语',
+            pos:[[30,58],[62,72],[38,56],[68,50]] },
+  puppy:  { name:'Puppy',  cn:'小狗',  em:'🐶', bg:'#FFF8E1', accent:'#D3A017', pitch:1.42, rate:1.04, voice:'明亮中高',
+            pos:[[30,58],[68,54],[48,56],[66,52]] },
+  nah:    { name:'Narrator', cn:'旁白', em:'📖', bg:'#F1E9FF', accent:'#8B4AE8', pitch:1.00, rate:0.86, voice:'平稳叙述',
+            pos:[[50,50],[50,50],[50,50],[50,50]] }
 };
+
+/* 情绪修饰：让同一角色在不同句子里有抑扬顿挫，而不是一个调子念到底 */
+var TONES = {
+  normal:    { pitch:1.00, rate:1.00, label:'' },
+  happy:     { pitch:1.22, rate:1.08, label:'开心' },
+  excited:   { pitch:1.38, rate:1.16, label:'兴奋' },
+  question:  { pitch:1.20, rate:0.96, label:'疑问' },
+  surprised: { pitch:1.42, rate:1.12, label:'惊讶' },
+  sad:       { pitch:0.80, rate:0.84, label:'失落' },
+  worried:   { pitch:0.94, rate:0.90, label:'担心' },
+  angry:     { pitch:1.10, rate:1.10, label:'生气' },
+  proud:     { pitch:0.96, rate:0.92, label:'得意' },
+  whisper:   { pitch:0.86, rate:0.78, label:'轻声' },
+  thinking:  { pitch:0.98, rate:0.80, label:'思考' },
+  laugh:     { pitch:1.34, rate:1.10, label:'大笑' }
+};
+
+/* 显示用音高刻度：把绝对 pitch 映射成 1-10 格，让"差别大"看得见 */
+function pitchScale(chKey) {
+  var p = CHARACTERS[chKey].pitch;
+  return Math.max(1, Math.min(10, Math.round((p - 0.3) / (2.0 - 0.3) * 9 + 1)));
+}
+
+/* 每个角色的情绪可用区间：高音角色向上留余量，低音角色向下留余量 */
+var PITCH_RANGE = {
+  gerald: { min: 0.20, max: 0.62 },
+  piggie: { min: 1.15, max: 1.68 },
+  snake:  { min: 1.28, max: 1.92 },
+  puppy:  { min: 1.10, max: 1.58 },
+  nah:    { min: 0.80, max: 1.28 }
+};
+
+/* 基准嗓 × 情绪 → 最终音高/语速。
+   音高用"区间内插值"而不是直接相乘，否则高音角色的开心/兴奋会被 2.0 上限压成同一条线。 */
+function resolveVoice(chKey, toneKey) {
+  var ch = CHARACTERS[chKey] || CHARACTERS.nah;
+  var t = TONES[toneKey] || TONES.normal;
+  var rng = PITCH_RANGE[chKey] || { min: 0.8, max: Math.min(1.95, ch.pitch * 1.3) };
+
+  /* 情绪强度：sad=0 → normal=0.5 → surprised=1，映射到 [min,max] */
+  var strength = (t.pitch - 0.78) / (1.42 - 0.78);
+  if (strength < 0) strength = 0;
+  if (strength > 1) strength = 1;
+  /* 情绪越强，越向区间两端拉开，制造明显起伏 */
+  var curve = strength * strength * (3 - 2 * strength); // smoothstep，两端更分明
+  var pitch = rng.min + (rng.max - rng.min) * curve;
+
+  var rate = ch.rate * t.rate;
+  if (rate > 1.7) rate = 1.7;
+  if (rate < 0.55) rate = 0.55;
+
+  var segRate;
+  if (rate <= 0.92) segRate = [rate * 0.94, rate * 1.03, rate * 0.90, rate * 0.97];
+  else segRate = [rate * 0.98, rate * 1.06, rate * 0.99, rate * 1.02];
+  return { pitch: pitch, rate: rate, segRate: segRate, tone: t, strength: curve };
+}
 
 /* =========================================================
    插图（纯手写内联 SVG，无任何外部资源）
@@ -353,27 +466,35 @@ var STORIES = [
     blurb: '小猪小象在玩抛球，小蛇也想加入——可是蛇没有手呀！',
     cast: ['piggie', 'gerald', 'snake'],
     scenes: [
-      { bg:['#DFF3FF', '#BEE3F7'], who:[{role:'piggie'},{role:'gerald'}], cap: 'Gerald 和 Piggie 在玩抛球游戏' },
-      { bg:['#E8F5E9', '#C8E6C9'], who:[{role:'snake', scale:.9}], cap: '小蛇 Snake 来了，他也想玩' },
-      { bg:['#FFF3E0', '#FFE0B2'], who:[{role:'piggie'},{role:'gerald'},{role:'snake', scale:.85}], cap: '三个人一起，就能发明新玩法' }
+      { bg:['#D6ECFB', '#A9D4F2'], cap: '第 1 幕 · 一起玩抛球，玩得正开心' },
+      { bg:['#FBE0EC', '#F2C0D8'], cap: '第 2 幕 · 小蛇来了，他也想玩' },
+      { bg:['#FFF3DC', '#F2DFB4'], cap: '第 3 幕 · 球砸到了头！怎么办？' },
+      { bg:['#E2F6E4', '#C0E5C4'], cap: '第 4 幕 · 想出一个新玩法，三个人一起玩' }
     ],
     script: [
-      { who:'gerald', en:"Let us play catch!", cn:'我们来玩抛接球吧！' },
-      { who:'piggie', en:"Yes! I love this game.", cn:'好呀！我最喜欢这个游戏了。' },
-      { who:'snake',  en:"Hello! Can I play too?", cn:'你们好！我也能玩吗？' },
-      { who:'piggie', en:"Oh! But you have no arms.", cn:'哦……可是你没有手臂呀。' },
-      { who:'gerald', en:"I am sorry. This game needs arms.", cn:'对不起，这个游戏要有手臂才能玩。' },
-      { who:'snake',  en:"I still want to try!", cn:'我还是想试一试！' },
-      { who:'piggie', en:"Let us throw the ball to Snake.", cn:'我们把球抛给小蛇试试吧。' },
-      { who:'gerald', en:"Hey! That hit my head!", cn:'嘿！球打到我的头了！' },
-      { who:'snake',  en:"Oops! Sorry, Gerald.", cn:'哎呀！对不起，Gerald。' },
-      { who:'piggie', en:"Wait! I have an idea.", cn:'等等！我有个好主意。' },
-      { who:'gerald', en:"We can make a brand new game!", cn:'我们可以发明一个全新的游戏！' },
-      { who:'snake',  en:"A new game for all of us?", cn:'一个我们三个都能玩的游戏？' },
-      { who:'piggie', en:"Yes! Let us play together.", cn:'对！我们一起玩。' },
-      { who:'gerald', en:"Friends always find a way.", cn:'好朋友总能想到办法。' }
+      { who:'gerald', tone:'excited',   en:"Let us play catch!", cn:'我们来玩抛接球吧！' },
+      { who:'piggie', tone:'happy',     en:"Yes! I love this game.", cn:'好呀！我最喜欢这个游戏了。' },
+      { who:'gerald', tone:'proud',     en:"I am the best thrower!", cn:'我是最厉害的投手！' },
+      { who:'piggie', tone:'laugh',     en:"Hee hee! I caught it!", cn:'嘿嘿！我接住啦！' },
+      { who:'snake',  tone:'question',  en:"Hello! Can I play too?", cn:'你们好！我也能玩吗？' },
+      { who:'piggie', tone:'surprised', en:"Oh! But you have no arms.", cn:'哦……可是你没有手臂呀。' },
+      { who:'gerald', tone:'worried',   en:"I am sorry. This game needs arms.", cn:'对不起，这个游戏要有手臂才能玩。' },
+      { who:'snake',  tone:'sad',       en:"Oh. I see.", cn:'哦……我明白了。' },
+      { who:'snake',  tone:'normal',    en:"But I still want to try!", cn:'可我还是想试一试！' },
+      { who:'piggie', tone:'excited',   en:"Let us throw the ball to Snake!", cn:'我们把球抛给小蛇试试吧！' },
+      { who:'snake',  tone:'excited',   en:"I am ready! Throw it here!", cn:'我准备好了！抛过来吧！' },
+      { who:'gerald', tone:'surprised', en:"Hey! That hit my head!", cn:'嘿！球打到我的头了！' },
+      { who:'snake',  tone:'worried',   en:"Oops! Sorry, Gerald.", cn:'哎呀！对不起，Gerald。' },
+      { who:'gerald', tone:'sad',       en:"I do not think this works.", cn:'我觉得这样好像不行。' },
+      { who:'piggie', tone:'excited',   en:"Wait! I have an idea!", cn:'等等！我有个好主意！' },
+      { who:'gerald', tone:'question',  en:"What is your idea?", cn:'什么好主意？' },
+      { who:'piggie', tone:'proud',     en:"We can make a brand new game!", cn:'我们可以发明一个全新的游戏！' },
+      { who:'snake',  tone:'question',  en:"A new game for all of us?", cn:'一个我们三个都能玩的游戏？' },
+      { who:'gerald', tone:'happy',     en:"Yes! Let us play together.", cn:'对！我们一起玩。' },
+      { who:'snake',  tone:'happy',     en:"This is the best game ever!", cn:'这是最好玩的游戏了！' },
+      { who:'gerald', tone:'proud',     en:"Friends always find a way.", cn:'好朋友总能想到办法。' }
     ],
-    keywords: ['play', 'too', 'arms', 'throw', 'catch', 'new game', 'together', 'friend']
+    keywords: ['play', 'too', 'arms', 'throw', 'catch', 'ball', 'new game', 'together', 'friend']
   },
   {
     id: 'my-new-toy',
@@ -383,26 +504,30 @@ var STORIES = [
     blurb: '小猪得到一个新玩具，小象不小心弄坏了，两个人又气又难过……',
     cast: ['piggie', 'gerald'],
     scenes: [
-      { bg:['#FCE4EC', '#F8BBD0'], who:[{role:'piggie'}], cap: 'Piggie 拿到了一个闪闪发光的新玩具' },
-      { bg:['#EDE7F6', '#D1C4E9'], who:[{role:'piggie'},{role:'gerald'}], cap: '咔嚓——玩具坏了，两个人都愣住了' },
-      { bg:['#E8F5E9', '#C8E6C9'], who:[{role:'piggie'},{role:'gerald'}], cap: '一起修好它，比一个人玩更开心' }
+      { bg:['#FBE0EC', '#F2C0D8'], cap: '第 1 幕 · Piggie 拿到了一个闪闪发光的新玩具' },
+      { bg:['#E7E2F7', '#C9BEE8'], cap: '第 2 幕 · 咔嚓——玩具坏了' },
+      { bg:['#FBE3E6', '#F5BFC6'], cap: '第 3 幕 · 两个人都很生气、很难过' },
+      { bg:['#E2F6E4', '#C0E5C4'], cap: '第 4 幕 · 一起修好它，比一个人玩更开心' }
     ],
     script: [
-      { who:'piggie', en:"Look! This is my new toy!", cn:'你看！这是我的新玩具！' },
-      { who:'gerald', en:"Wow! It is so shiny.", cn:'哇！它好亮呀。' },
-      { who:'piggie', en:"You can hold it, but be careful.", cn:'你可以拿一下，但要小心哦。' },
-      { who:'gerald', en:"I will be very careful. Oh no!", cn:'我会很小心的……哦不！' },
-      { who:'piggie', en:"You broke it! I am so mad!", cn:'你把它弄坏了！我太生气了！' },
-      { who:'gerald', en:"I am sorry. It was an accident.", cn:'对不起，我不是故意的。' },
-      { who:'piggie', en:"I do not want to play now.", cn:'我现在不想玩了。' },
-      { who:'gerald', en:"Let us fix it together. Please?", cn:'我们一起把它修好吧，好吗？' },
-      { who:'piggie', en:"...Okay. Let us try.", cn:'……好吧，我们试试。' },
-      { who:'gerald', en:"Look! It works again!", cn:'你看！它又能用了！' },
-      { who:'piggie', en:"I forgive you, Gerald.", cn:'我原谅你了，Gerald。' },
-      { who:'gerald', en:"Can we share it now?", cn:'我们现在可以一起玩吗？' },
-      { who:'piggie', en:"Yes. Sharing is more fun.", cn:'可以。分享更好玩。' }
+      { who:'piggie', tone:'excited',   en:"Look! This is my new toy!", cn:'你看！这是我的新玩具！' },
+      { who:'gerald', tone:'surprised', en:"Wow! It is so shiny.", cn:'哇！它好亮呀。' },
+      { who:'piggie', tone:'proud',     en:"You can hold it. But be careful!", cn:'你可以拿一下。但要小心哦！' },
+      { who:'gerald', tone:'whisper',   en:"I will be very, very careful.", cn:'我会非常、非常小心的。' },
+      { who:'gerald', tone:'surprised', en:"Oh no!", cn:'哦不！' },
+      { who:'piggie', tone:'surprised', en:"What happened?", cn:'怎么了？' },
+      { who:'gerald', tone:'sad',       en:"I broke it. I am so sorry.", cn:'我把它弄坏了……真的很对不起。' },
+      { who:'piggie', tone:'angry',     en:"You broke it! I am so mad!", cn:'你把它弄坏了！我太生气了！' },
+      { who:'gerald', tone:'sad',       en:"It was an accident. I did not mean to.", cn:'我不是故意的，真的不是。' },
+      { who:'piggie', tone:'angry',     en:"I do not want to play now.", cn:'我现在不想玩了。' },
+      { who:'gerald', tone:'worried',   en:"Let us fix it together. Please?", cn:'我们一起把它修好吧，好吗？' },
+      { who:'piggie', tone:'thinking',  en:"Hmm ... Okay. Let us try.", cn:'嗯……好吧，我们试试。' },
+      { who:'gerald', tone:'excited',   en:"Look! It works again!", cn:'你看！它又能用了！' },
+      { who:'piggie', tone:'happy',     en:"You did it! I forgive you, Gerald.", cn:'你做到了！我原谅你了，Gerald。' },
+      { who:'gerald', tone:'question',  en:"Can we share it now?", cn:'我们现在可以一起玩吗？' },
+      { who:'piggie', tone:'happy',     en:"Yes. Sharing is more fun.", cn:'可以。分享更好玩。' }
     ],
-    keywords: ['new toy', 'broke', 'accident', 'sorry', 'fix', 'forgive', 'share']
+    keywords: ['new toy', 'broke', 'accident', 'sorry', 'fix', 'forgive', 'share', 'careful']
   },
   {
     id: 'i-broke-my-trunk',
@@ -412,24 +537,26 @@ var STORIES = [
     blurb: '小象的鼻子折了！原因是……一个越讲越长、越讲越好笑的故事。',
     cast: ['gerald', 'piggie'],
     scenes: [
-      { bg:['#E3F2FD', '#BBDEFB'], who:[{role:'gerald'}], cap: 'Gerald 的鼻子缠着绷带，看起来好可怜' },
-      { bg:['#FFF8E1', '#FFECB3'], who:[{role:'gerald'},{role:'piggie'}], cap: '"然后，来了一头河马……"' },
-      { bg:['#E8F5E9', '#C8E6C9'], who:[{role:'gerald'},{role:'piggie'}], cap: '讲到最后，两个人一起哈哈大笑' }
+      { bg:['#D6ECFB', '#A9D4F2'], cap: '第 1 幕 · Gerald 的鼻子怎么了？' },
+      { bg:['#FFF3DC', '#F2DFB4'], cap: '第 2 幕 · 「一开始，我举起了一头河马……」' },
+      { bg:['#FBE0EC', '#F2C0D8'], cap: '第 3 幕 · 「然后，一头犀牛坐到了河马身上！」' },
+      { bg:['#E2F6E4', '#C0E5C4'], cap: '第 4 幕 · 讲到最后，两个人一起哈哈大笑' }
     ],
     script: [
-      { who:'piggie', en:"Gerald! What happened to your trunk?", cn:'Gerald！你的鼻子怎么了？' },
-      { who:'gerald', en:"I broke my trunk.", cn:'我的鼻子折了。' },
-      { who:'piggie', en:"How did you break it?", cn:'你是怎么弄折的？' },
-      { who:'gerald', en:"It was a very crazy day.", cn:'那是非常疯狂的一天。' },
-      { who:'gerald', en:"First, I lifted a hippo with my trunk.", cn:'一开始，我用鼻子举起了一头河马。' },
-      { who:'piggie', en:"A hippo? With your trunk?", cn:'一头河马？用你的鼻子？' },
-      { who:'gerald', en:"Then, a rhino sat on the hippo!", cn:'然后，一头犀牛坐到了河马身上！' },
-      { who:'piggie', en:"Oh my! Then what?", cn:'天哪！然后呢？' },
-      { who:'gerald', en:"Finally, I lifted them all up!", cn:'最后，我把它们全都举了起来！' },
-      { who:'gerald', en:"Then I tripped. That is how.", cn:'然后我绊了一跤。就是这样。' },
-      { who:'piggie', en:"That is the best story ever!", cn:'这是最好笑的故事了！' },
-      { who:'gerald', en:"Can you believe it?", cn:'你信吗？' },
-      { who:'piggie', en:"No! Tell me again!", cn:'不信！再讲一遍！' }
+      { who:'piggie', tone:'surprised', en:"Gerald! What happened to your trunk?", cn:'Gerald！你的鼻子怎么了？' },
+      { who:'gerald', tone:'sad',       en:"I broke my trunk.", cn:'我的鼻子折了。' },
+      { who:'piggie', tone:'question',  en:"How did you break it?", cn:'你是怎么弄折的？' },
+      { who:'gerald', tone:'normal',    en:"It was a very crazy day.", cn:'那是非常疯狂的一天。' },
+      { who:'gerald', tone:'proud',     en:"First, I lifted a hippo with my trunk!", cn:'一开始，我用鼻子举起了一头河马！' },
+      { who:'piggie', tone:'surprised', en:"A hippo? With your trunk?", cn:'一头河马？用你的鼻子？' },
+      { who:'gerald', tone:'excited',   en:"Then, a rhino sat on the hippo!", cn:'然后，一头犀牛坐到了河马身上！' },
+      { who:'piggie', tone:'surprised', en:"Oh my! Then what happened?", cn:'天哪！然后呢？' },
+      { who:'gerald', tone:'excited',   en:"And then, my friend came too!", cn:'再然后，我的朋友也来了！' },
+      { who:'gerald', tone:'excited',   en:"Finally, I lifted them all up!", cn:'最后，我把它们全都举了起来！' },
+      { who:'gerald', tone:'normal',    en:"Then I tripped. That is how I broke it.", cn:'然后我绊了一跤。就是这么弄折的。' },
+      { who:'piggie', tone:'laugh',     en:"That is the funniest story ever!", cn:'这是最好笑的故事了！' },
+      { who:'gerald', tone:'question',  en:"Can you believe it?", cn:'你信吗？' },
+      { who:'piggie', tone:'laugh',     en:"No! Tell me again!", cn:'不信！再讲一遍！' }
     ],
     keywords: ['broke', 'trunk', 'hippo', 'rhino', 'first', 'then', 'finally', 'story']
   },
@@ -441,23 +568,25 @@ var STORIES = [
     blurb: '今天是快乐小猪节，小猪们好开心——可是 Gerald 不是猪，他有点难过。',
     cast: ['piggie', 'gerald'],
     scenes: [
-      { bg:['#FCE4EC', '#F8BBD0'], who:[{role:'piggie'},{role:'piggie', scale:.8, flip:true}], cap: '小猪节到了！到处都是猪猪在跳舞' },
-      { bg:['#E3F2FD', '#BBDEFB'], who:[{role:'gerald'}], cap: 'Gerald 有点难过：我不是猪呀' },
-      { bg:['#FFF8E1', '#FFECB3'], who:[{role:'gerald'},{role:'piggie'}], cap: '不一样也没关系，我们还是好朋友' }
+      { bg:['#FBE0EC', '#F2C0D8'], cap: '第 1 幕 · 小猪节到了！到处都是猪猪在跳舞' },
+      { bg:['#D6ECFB', '#A9D4F2'], cap: '第 2 幕 · Gerald 有点难过：我不是猪呀' },
+      { bg:['#FFF3DC', '#F2DFB4'], cap: '第 3 幕 · 「你是我最好的朋友，这就够了」' },
+      { bg:['#E2F6E4', '#C0E5C4'], cap: '第 4 幕 · 不一样也没关系，一起庆祝吧' }
     ],
     script: [
-      { who:'piggie', en:"Happy Pig Day! It is the best day!", cn:'快乐小猪节！这是最棒的日子！' },
-      { who:'gerald', en:"Happy... Pig Day?", cn:'快乐……小猪节？' },
-      { who:'piggie', en:"We dance, we sing, we eat!", cn:'我们跳舞、唱歌、还有好多吃的！' },
-      { who:'gerald', en:"But I am not a pig.", cn:'可是我不是猪呀。' },
-      { who:'piggie', en:"Oh. That is true.", cn:'哦……确实是这样。' },
-      { who:'gerald', en:"I feel a little sad.", cn:'我有点难过。' },
-      { who:'piggie', en:"You do not need to be a pig.", cn:'你不需要是猪才可以。' },
-      { who:'gerald', en:"I do not?", cn:'真的吗？' },
-      { who:'piggie', en:"You are my best friend. That is enough.", cn:'你是我最好的朋友，这就够了。' },
-      { who:'gerald', en:"Then let us celebrate together!", cn:'那我们一起庆祝吧！' },
-      { who:'piggie', en:"Yes! Being different is fine.", cn:'好！不一样也没关系。' },
-      { who:'gerald', en:"I love you, my friend.", cn:'我爱你，我的朋友。' }
+      { who:'piggie', tone:'excited',   en:"Happy Pig Day! It is the best day!", cn:'快乐小猪节！这是最棒的日子！' },
+      { who:'gerald', tone:'question',  en:"Happy ... Pig Day?", cn:'快乐……小猪节？' },
+      { who:'piggie', tone:'excited',   en:"We dance, we sing, we eat!", cn:'我们跳舞、唱歌、还有好多吃的！' },
+      { who:'gerald', tone:'sad',       en:"But I am not a pig.", cn:'可是我不是猪呀。' },
+      { who:'piggie', tone:'surprised', en:"Oh. That is true.", cn:'哦……确实是这样。' },
+      { who:'gerald', tone:'sad',       en:"I feel a little sad today.", cn:'我今天有点难过。' },
+      { who:'piggie', tone:'worried',   en:"Oh no. Do not be sad.", cn:'哦不，别难过。' },
+      { who:'piggie', tone:'happy',     en:"You do not need to be a pig!", cn:'你不需要是猪才可以！' },
+      { who:'gerald', tone:'question',  en:"I do not?", cn:'真的吗？' },
+      { who:'piggie', tone:'happy',     en:"You are my best friend. That is enough.", cn:'你是我最好的朋友，这就够了。' },
+      { who:'gerald', tone:'happy',     en:"Then let us celebrate together!", cn:'那我们一起庆祝吧！' },
+      { who:'piggie', tone:'proud',     en:"Yes! Being different is fine.", cn:'好！不一样也没关系。' },
+      { who:'gerald', tone:'happy',     en:"I love you, my friend.", cn:'我爱你，我的朋友。' }
     ],
     keywords: ['Happy Pig Day', 'pig', 'different', 'sad', 'best friend', 'celebrate', 'together']
   },
@@ -469,24 +598,25 @@ var STORIES = [
     blurb: '小猪第一次收到派对邀请，拉着小象一起准备，可是穿什么才对呢？',
     cast: ['piggie', 'gerald'],
     scenes: [
-      { bg:['#FCE4EC', '#F8BBD0'], who:[{role:'piggie'}], cap: '邀请函！Piggie 第一次要去派对' },
-      { bg:['#EDE7F6', '#D1C4E9'], who:[{role:'piggie'},{role:'gerald'}], cap: '穿得太正式？太傻气？他们试了一次又一次' },
-      { bg:['#FFF8E1', '#FFECB3'], who:[{role:'piggie'},{role:'gerald'}], cap: '最后他们明白：和朋友一起去，怎样都开心' }
+      { bg:['#FBE0EC', '#F2C0D8'], cap: '第 1 幕 · 邀请函！Piggie 第一次要去派对' },
+      { bg:['#E7E2F7', '#C9BEE8'], cap: '第 2 幕 · 穿得太正式？太傻气？试了一次又一次' },
+      { bg:['#FFF3DC', '#F2DFB4'], cap: '第 3 幕 · 到底穿什么才好呢？' },
+      { bg:['#E2F6E4', '#C0E5C4'], cap: '第 4 幕 · 带着微笑一起去，怎样都开心' }
     ],
     script: [
-      { who:'piggie', en:"I am invited to a party!", cn:'我被邀请去派对啦！' },
-      { who:'gerald', en:"A party! That is exciting.", cn:'派对！太让人兴奋了。' },
-      { who:'piggie', en:"But what should I wear?", cn:'可是我该穿什么呢？' },
-      { who:'gerald', en:"Maybe something fancy.", cn:'也许穿得正式一点。' },
-      { who:'piggie', en:"This is too fancy! I cannot walk.", cn:'这太正式了！我都走不动了。' },
-      { who:'gerald', en:"Then try something silly.", cn:'那试试傻气一点的。' },
-      { who:'piggie', en:"This is too silly! Everyone will laugh.", cn:'这太傻了！大家会笑我的。' },
-      { who:'gerald', en:"Hmm. Let us think again.", cn:'嗯……我们再想想。' },
-      { who:'piggie', en:"What will you wear, Gerald?", cn:'那你穿什么呢，Gerald？' },
-      { who:'gerald', en:"I will wear a smile.", cn:'我会带着微笑去。' },
-      { who:'piggie', en:"Then I will wear one too!", cn:'那我也带着微笑！' },
-      { who:'gerald', en:"Let us go to the party together.", cn:'我们一起去派对。' },
-      { who:'piggie', en:"Best party ever!", cn:'最棒的派对！' }
+      { who:'piggie', tone:'excited',   en:"I am invited to a party!", cn:'我被邀请去派对啦！' },
+      { who:'gerald', tone:'excited',   en:"A party! That is exciting!", cn:'派对！太让人兴奋了！' },
+      { who:'piggie', tone:'worried',   en:"But what should I wear?", cn:'可是我该穿什么呢？' },
+      { who:'gerald', tone:'thinking',  en:"Maybe something fancy.", cn:'也许穿得正式一点。' },
+      { who:'piggie', tone:'sad',       en:"This is too fancy! I cannot walk.", cn:'这太正式了！我都走不动了。' },
+      { who:'gerald', tone:'thinking',  en:"Then try something silly.", cn:'那试试傻气一点的。' },
+      { who:'piggie', tone:'worried',   en:"This is too silly! Everyone will laugh.", cn:'这太傻了！大家会笑我的。' },
+      { who:'gerald', tone:'thinking',  en:"Hmm. Let us think again.", cn:'嗯……我们再想想。' },
+      { who:'piggie', tone:'question',  en:"What will you wear, Gerald?", cn:'那你穿什么呢，Gerald？' },
+      { who:'gerald', tone:'happy',     en:"I will wear a smile.", cn:'我会带着微笑去。' },
+      { who:'piggie', tone:'excited',   en:"Then I will wear one too!", cn:'那我也带着微笑！' },
+      { who:'gerald', tone:'happy',     en:"Let us go to the party together.", cn:'我们一起去派对。' },
+      { who:'piggie', tone:'laugh',     en:"This will be the best party ever!", cn:'这一定是最棒的派对！' }
     ],
     keywords: ['invited', 'party', 'wear', 'fancy', 'silly', 'smile', 'together', 'go']
   },
@@ -498,26 +628,28 @@ var STORIES = [
     blurb: 'Gerald 拿到一个冰淇淋，好好吃……可是好朋友 Piggie 还没吃到呢。',
     cast: ['gerald', 'piggie'],
     scenes: [
-      { bg:['#E3F2FD', '#BBDEFB'], who:[{role:'gerald'}], cap: 'Gerald 拿着一个冰淇淋，看起来很好吃' },
-      { bg:['#FCE4EC', '#F8BBD0'], who:[{role:'gerald'}], cap: '要不要分享呢？他想了很久很久' },
-      { bg:['#FFF8E1', '#FFECB3'], who:[{role:'gerald'},{role:'piggie'}], cap: '冰淇淋化了，可朋友的心是甜的' }
+      { bg:['#D6ECFB', '#A9D4F2'], cap: '第 1 幕 · Gerald 拿着一个冰淇淋，看起来好好吃' },
+      { bg:['#FBE0EC', '#F2C0D8'], cap: '第 2 幕 · 要不要分享呢？他想了很久很久' },
+      { bg:['#E7E2F7', '#C9BEE8'], cap: '第 3 幕 · 等啊等，冰淇淋都快要化掉了……' },
+      { bg:['#FFF3DC', '#F2DFB4'], cap: '第 4 幕 · 分享出去的那一刻，比吃到更甜' }
     ],
     script: [
-      { who:'gerald', en:"I have a big ice cream!", cn:'我有一个大大的冰淇淋！' },
-      { who:'gerald', en:"It is so delicious.", cn:'它太好吃了。' },
-      { who:'gerald', en:"But Piggie is not here.", cn:'可是 Piggie 不在这里。' },
-      { who:'gerald', en:"Should I share my ice cream?", cn:'我要不要分享我的冰淇淋？' },
-      { who:'gerald', en:"What if I eat it all?", cn:'要是我全吃掉了呢？' },
-      { who:'gerald', en:"What if I wait for her?", cn:'要是我等她呢？' },
-      { who:'gerald', en:"Waiting is so hard!", cn:'等待好难熬啊！' },
-      { who:'piggie', en:"Hi, Gerald! What are you doing?", cn:'嗨，Gerald！你在做什么？' },
-      { who:'gerald', en:"Oh! I was waiting for you.", cn:'哦！我在等你呀。' },
-      { who:'gerald', en:"Would you like some ice cream?", cn:'你要来一点冰淇淋吗？' },
-      { who:'piggie', en:"You saved it for me? Thank you!", cn:'你特意留给我的？谢谢你！' },
-      { who:'gerald', en:"I am glad I shared.", cn:'我很高兴我分享了。' },
-      { who:'piggie', en:"Friends share and care.", cn:'朋友就是要分享和互相关心。' }
+      { who:'gerald', tone:'excited',   en:"I have a big ice cream!", cn:'我有一个大大的冰淇淋！' },
+      { who:'gerald', tone:'happy',     en:"It is so delicious.", cn:'它太好吃了。' },
+      { who:'gerald', tone:'normal',    en:"But Piggie is not here.", cn:'可是 Piggie 不在这里。' },
+      { who:'gerald', tone:'thinking',  en:"Should I share my ice cream?", cn:'我要不要分享我的冰淇淋？' },
+      { who:'gerald', tone:'thinking',  en:"What if I eat it all?", cn:'要是我全吃掉了呢？' },
+      { who:'gerald', tone:'thinking',  en:"What if I wait for her?", cn:'要是我等她呢？' },
+      { who:'gerald', tone:'sad',       en:"Waiting is so hard!", cn:'等待好难熬啊！' },
+      { who:'gerald', tone:'surprised', en:"Oh no! It is melting!", cn:'哦不！它要化了！' },
+      { who:'piggie', tone:'happy',     en:"Hi, Gerald! What are you doing?", cn:'嗨，Gerald！你在做什么？' },
+      { who:'gerald', tone:'happy',     en:"Oh! I was waiting for you.", cn:'哦！我在等你呀。' },
+      { who:'gerald', tone:'question',  en:"Would you like some ice cream?", cn:'你要来一点冰淇淋吗？' },
+      { who:'piggie', tone:'surprised', en:"You saved it for me? Thank you!", cn:'你特意留给我的？谢谢你！' },
+      { who:'gerald', tone:'happy',     en:"I am glad I shared.", cn:'我很高兴我分享了。' },
+      { who:'piggie', tone:'happy',     en:"Friends share and care.", cn:'朋友就是要分享和互相关心。' }
     ],
-    keywords: ['ice cream', 'share', 'delicious', 'wait', 'glad', 'friend', 'care']
+    keywords: ['ice cream', 'share', 'delicious', 'wait', 'melt', 'glad', 'friend', 'care']
   }
 ];
 
@@ -546,42 +678,95 @@ function loadVoices() {
   var vs = synth.getVoices() || [];
   voicePool.female = []; voicePool.male = [];
   vs.forEach(function (v) {
-    if (!/en/i.test(v.lang)) return;
+    if (!/^en/i.test(v.lang)) return;
     var n = (v.name || '').toLowerCase();
-    if (/female|samantha|zira|aria|jenny|michelle|karen|moira|tessa|victoria|fiona|susan|google us english/.test(n)) voicePool.female.push(v);
-    else if (/male|david|mark|guy|alex|daniel|fred|google uk english male/.test(n)) voicePool.male.push(v);
+    if (/female|samantha|zira|aria|jenny|michelle|karen|moira|tessa|victoria|fiona|susan|google us english|allison|ava|serena/.test(n)) voicePool.female.push(v);
+    else if (/male|david|mark|guy|alex|daniel|fred|google uk english male|rishi|arthur|oliver|tom/.test(n)) voicePool.male.push(v);
+    else voicePool.female.push(v);
   });
+  voicePool.female = uniqBy(voicePool.female);
+  voicePool.male = uniqBy(voicePool.male);
+}
+function uniqBy(arr) {
+  var seen = {}, out = [];
+  arr.forEach(function (v) { if (!seen[v.name]) { seen[v.name] = 1; out.push(v); } });
+  return out;
 }
 if (synth) { loadVoices(); synth.onvoiceschanged = loadVoices; }
 
-function pickVoice(ch) {
+/* 每个角色稳定绑定一条音色，保证全篇一致性 */
+var voiceAssign = {};
+function pickVoice(chKey) {
+  if (voiceAssign[chKey]) return voiceAssign[chKey];
+  var ch = CHARACTERS[chKey] || CHARACTERS.nah;
   var pool;
-  if (ch.pitch >= 1.3) pool = voicePool.female.length ? voicePool.female : voicePool.male;
-  else if (ch.pitch <= 0.8) pool = voicePool.male.length ? voicePool.male : voicePool.female;
+  if (ch.pitch >= 1.6) pool = voicePool.female.length ? voicePool.female : voicePool.male;
+  else if (ch.pitch <= 0.5) pool = voicePool.male.length ? voicePool.male : voicePool.female;
   else pool = voicePool.female.length ? voicePool.female : voicePool.male;
   if (!pool.length) return null;
-  // 按角色名做稳定偏移，保证同一角色总是同一条音色
-  var seed = (ch.name || 'x').length + (ch.pitch * 10 | 0);
-  return pool[seed % pool.length];
+  var order = ['gerald', 'piggie', 'snake', 'puppy', 'nah'];
+  var idx = order.indexOf(chKey);
+  if (idx < 0) idx = 0;
+  var v = pool[idx % pool.length];
+  voiceAssign[chKey] = v;
+  return v;
 }
 
-/* 核心朗读：按角色决定音高 / 语速 / 音色 */
+/* 把句子切成朗读分段，让长句也有抑扬顿挫（不是一条平线念到底） */
+function splitProsody(text) {
+  var parts = String(text).trim().split(/(?<=[.!?,;])\s+/).filter(function (x) { return x.length; });
+  if (parts.length <= 1) {
+    /* 没有标点也切成两半，制造波浪 */
+    var t = String(text).trim();
+    var sp = t.indexOf(' ', Math.floor(t.length * 0.45));
+    if (sp > 2 && t.length > 18) return [t.slice(0, sp), t.slice(sp)];
+    return [t];
+  }
+  return parts;
+}
+function trimPunct(s) { return String(s).replace(/[.!?,;:]+$/, ''); }
+
+/* 核心朗读：角色基准嗓 × 情绪修饰 × 分段波浪 */
+var speakSeq = 0;
 function speak(text, whoKey, opts) {
   if (!synth) return null;
   opts = opts || {};
   var ch = CHARACTERS[whoKey] || CHARACTERS.nah;
+  var vp = resolveVoice(whoKey, opts.tone);
+  var segs = opts.plain ? [text] : splitProsody(text);
+  var seq = ++speakSeq;
+  /* 只有"当前这一轮朗读"才允许继续念，避免旧队列打断新句子 */
+  function step(i) {
+    if (seq !== speakSeq) return;
+    if (i >= segs.length) { if (opts.onEnd) opts.onEnd(); return; }
+    var seg = segs[i];
+    var isLast = i === segs.length - 1;
+    var u = new SpeechSynthesisUtterance(trimPunct(seg) + (/[?!]$/.test(seg) ? '?' : '.'));
+    u.lang = 'en-US';
+    /* 分段内部的音高与语速落差，制造起伏 */
+    var wave = i % 2 === 0 ? 1.0 : 0.93;
+    var p = vp.pitch * wave;
+    var r = vp.segRate[i % vp.segRate.length];
+    if (isLast && /[?!]$/.test(String(seg))) { p *= 1.06; }
+    u.pitch = Math.max(0.1, Math.min(2, p));
+    u.rate = Math.max(0.55, Math.min(1.7, r));
+    u.volume = 1;
+    var v = pickVoice(whoKey);
+    if (v) u.voice = v;
+    if (i === 0 && opts.onStart) u.onstart = function () { if (seq === speakSeq) opts.onStart(); };
+    u.onend = function () { if (seq === speakSeq) setTimeout(function () { step(i + 1); }, i === segs.length - 1 ? 0 : 60); };
+    u.onerror = function () { if (seq === speakSeq) setTimeout(function () { step(i + 1); }, 30); };
+    synth.speak(u);
+  }
   try { synth.cancel(); } catch (e) {}
-  var u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  u.pitch = opts.pitch != null ? opts.pitch : ch.pitch;
-  u.rate = opts.rate != null ? opts.rate : ch.rate;
-  u.volume = 1;
-  var v = pickVoice(ch);
-  if (v) u.voice = v;
-  u.onstart = function () { if (opts.onStart) opts.onStart(); };
-  u.onend = function () { if (opts.onEnd) opts.onEnd(); };
-  synth.speak(u);
-  return u;
+  step(0);
+  return seq;
+}
+
+function stopSpeak() {
+  speakSeq++;
+  state.playingAll = false;
+  try { if (synth) synth.cancel(); } catch (e) {}
 }
 
 /* =========================================================
@@ -650,18 +835,40 @@ function renderCast() {
   (state.story.cast || []).forEach(function (k) {
     var ch = CHARACTERS[k];
     if (!ch) return;
+    var lv = pitchScale(k);
+    var bars = '';
+    for (var i = 1; i <= 10; i++) {
+      bars += '<i style="left:' + ((i - 1) * 10) + '%;width:9%;' +
+        (i <= lv ? 'background:' + ch.accent : 'background:transparent') + '"></i>';
+    }
     var d = document.createElement('div');
     d.className = 'cast-card';
     d.style.setProperty('--cc-bg', ch.bg);
     d.innerHTML = '<div class="cav" style="font-size:24px">' + ch.em + '</div>' +
-      '<div><div class="cname">' + ch.name + ' <span style="font-weight:600;color:#8A82A0">' + ch.cn + '</span></div>' +
-      '<div class="cvoice">voice: ' + ch.voice + '</div></div>';
+      '<div style="flex:1;min-width:0"><div class="cname">' + ch.name +
+      ' <span style="font-weight:600;color:#8A82A0">' + ch.cn + '</span></div>' +
+      '<div class="vbar" style="display:flex;gap:2px;height:7px;margin-top:4px">' +
+      '<span style="flex:1;display:block;position:relative">' + bars + '</span></div>' +
+      '<div class="cvoice">' + ch.voice + ' · 音高 ' + lv + '/10</div></div>';
     d.addEventListener('click', function () {
-      speak(ch.name + '. Hello! It is me.', k);
+      speak(ch.name + '. Hello! It is me!', k, { tone: 'happy' });
       flashCard(d);
     });
     row.appendChild(d);
   });
+  /* 音色对照表：让"差别大"一眼看得见 */
+  if (state.story.cast.length > 1) {
+    var list = '<div class="voice-table">';
+    state.story.cast.forEach(function (k) {
+      var ch = CHARACTERS[k];
+      var lv = pitchScale(k);
+      list += '<div class="vt-row"><span class="vn" style="color:' + ch.accent + '">' + ch.em + ' ' + ch.name + '</span>' +
+        '<span class="vbar"><i style="left:0;width:' + (lv * 10) + '%;background:' + ch.accent + '"></i></span>' +
+        '<span class="vt">' + ch.voice + '</span></div>';
+    });
+    list += '</div>';
+    row.insertAdjacentHTML('afterend', list);
+  }
 }
 
 function flashCard(el) {
@@ -669,49 +876,144 @@ function flashCard(el) {
   setTimeout(function () { el.style.boxShadow = ''; }, 700);
 }
 
-function renderStage() {
-  var s = state.story;
-  var idx = Math.min(state.lineIndex, s.scenes.length - 1);
-  var sc = s.scenes[idx] || s.scenes[0];
-  $('stage').innerHTML = scene(sc.who, sc.bg[0], sc.bg[1]) +
-    '<div class="caption">' + sc.cap + '</div>';
+/* 场景人物布局：每个角色站在固定位置上，头顶挂自己的话 */
+function sceneFigure(whoKey, lineIdx, bob) {
+  var ch = CHARACTERS[whoKey] || CHARACTERS.nah;
+  var n = state.story.script.length;
+  var sceneIdx = sceneIndexOfLine(lineIdx);
+  var place = (ch.pos && ch.pos[sceneIdx]) || [50, 52];
+  var art = FIG[whoKey] || ART.piggieL;
+  var inv = false;
+  /* 左半边的人物面朝右，右半边面朝左，看起来像在对话 */
+  if (place[0] > 52) inv = true;
+  var flip = '';
+  return '<div class="figure' + (bob ? ' active' : '') + '" style="left:' + place[0] + '%;top:' + place[1] +
+    '%;--c-accent:' + ch.accent + ';--c-glow:' + hexA(ch.accent, .34) + '">' +
+    '<div class="fig-bub" data-idx="' + lineIdx + '" style="border-color:' + ch.accent +
+    ';--c-accent:' + ch.accent + '">' +
+    '<div class="fig-name" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.em + '</div>' +
+    '<div class="fig-en">' + state.story.script[lineIdx].en + '</div>' +
+    '<div class="fig-cn">' + state.story.script[lineIdx].cn + '</div>' +
+    '</div>' +
+    '<div class="art"><span class="' + (inv ? '' : '') + '">' +
+    '<svg viewBox="0 0 100 100">' + art + '</svg></span></div>' +
+    '<div class="fig-name" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.em + '</div>' +
+    '</div>';
 }
 
-function renderLines() {
-  var c = $('lineList');
-  c.innerHTML = '';
-  state.story.script.forEach(function (ln, i) {
-    var ch = CHARACTERS[ln.who] || CHARACTERS.nah;
-    var d = document.createElement('div');
-    d.className = 'line';
-    d.dataset.index = i;
-    d.style.setProperty('--line-accent', ch.accent);
-    d.innerHTML = '<div class="avatar" style="font-size:20px">' + ch.em + '</div>' +
-      '<div class="body"><div class="who">' + ch.name + '</div>' +
-      '<div class="en">' + ln.en + '</div>' +
-      '<div class="cn">' + ln.cn + '</div></div>' +
-      '<div class="spk">🔊</div>';
-    d.addEventListener('click', function () { playLine(i, true); });
-    c.appendChild(d);
+/* 台词 → 所属分幕 */
+function sceneIndexOfLine(lineIdx) {
+  var n = state.story.script.length;
+  var sc = state.story.scenes.length;
+  return Math.min(sc - 1, Math.floor(lineIdx / n * sc));
+}
+
+/* 角色专属立绘（去掉外层 svg 包装，供场景内复用） */
+var FIG = {
+  piggie: '<circle cx="50" cy="54" r="34" fill="#F7A8C4"/><ellipse cx="32" cy="26" rx="12" ry="14" fill="#F7A8C4" transform="rotate(-18 32 26)"/><ellipse cx="68" cy="26" rx="12" ry="14" fill="#F7A8C4" transform="rotate(18 68 26)"/><ellipse cx="32" cy="26" rx="7" ry="8" fill="#FBD3E2" transform="rotate(-18 32 26)"/><ellipse cx="68" cy="26" rx="7" ry="8" fill="#FBD3E2" transform="rotate(18 68 26)"/><circle cx="38" cy="48" r="5" fill="#3A3350"/><circle cx="62" cy="48" r="5" fill="#3A3350"/><circle cx="39.8" cy="46.2" r="1.7" fill="#FFF"/><circle cx="63.8" cy="46.2" r="1.7" fill="#FFF"/><ellipse cx="50" cy="66" rx="15" ry="11" fill="#F58BB0"/><ellipse cx="44" cy="66" rx="3.4" ry="4.6" fill="#D2597F"/><ellipse cx="56" cy="66" rx="3.4" ry="4.6" fill="#D2597F"/><path d="M44 79 q6 6 12 0" stroke="#B94A6E" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="22" cy="60" r="6" fill="#F6B9CE" opacity=".85"/><circle cx="78" cy="60" r="6" fill="#F6B9CE" opacity=".85"/>',
+  gerald: '<ellipse cx="50" cy="58" rx="35" ry="31" fill="#8FC9EC"/><ellipse cx="15" cy="50" rx="15" ry="19" fill="#8FC9EC"/><ellipse cx="85" cy="50" rx="15" ry="19" fill="#8FC9EC"/><ellipse cx="15" cy="50" rx="9" ry="12" fill="#B3DCF5"/><ellipse cx="85" cy="50" rx="9" ry="12" fill="#B3DCF5"/><circle cx="37" cy="44" r="5.4" fill="#2E4560"/><circle cx="63" cy="44" r="5.4" fill="#2E4560"/><circle cx="38.8" cy="42.2" r="1.8" fill="#FFF"/><circle cx="64.8" cy="42.2" r="1.8" fill="#FFF"/><path d="M50 56 q-9 7 -15 3 q-5 5 -2 11 q7 5 17 -2 q10 7 17 2 q3 -6 -2 -11 q-6 4 -15 -3 z" fill="#6FB2DC"/><path d="M50 60 q-6 4 -11 1" stroke="#4E8FBB" stroke-width="1.6" fill="none"/><path d="M50 60 q6 4 11 1" stroke="#4E8FBB" stroke-width="1.6" fill="none"/><path d="M28 24 q7 -12 14 -4 q6 -11 13 -1" stroke="#8FC9EC" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/><path d="M72 24 q-7 -12 -14 -4 q-6 -11 -13 -1" stroke="#8FC9EC" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/>',
+  snake: '<path d="M20 84 q22 0 22 -18 q0 -16 20 -16 q22 0 22 -18 q0 -10 -12 -10" stroke="#7CCB93" stroke-width="13" fill="none" stroke-linecap="round"/><circle cx="70" cy="22" r="15" fill="#7CCB93"/><circle cx="65" cy="19" r="3.4" fill="#2E4B36"/><circle cx="75" cy="19" r="3.4" fill="#2E4B36"/><circle cx="65.9" cy="17.8" r="1.2" fill="#FFF"/><circle cx="75.9" cy="17.8" r="1.2" fill="#FFF"/><path d="M64 29 q6 5 12 0" stroke="#3F7A52" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M77 33 l6 6 m-2 -9 l8 4" stroke="#E8506E" stroke-width="2.2" stroke-linecap="round"/><circle cx="32" cy="72" r="3" fill="#A5DEB5"/><circle cx="46" cy="54" r="3" fill="#A5DEB5"/><circle cx="60" cy="42" r="3" fill="#A5DEB5"/>',
+  puppy: '<ellipse cx="50" cy="55" rx="31" ry="30" fill="#E8C48A"/><ellipse cx="22" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(-14 22 40)"/><ellipse cx="78" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(14 78 40)"/><circle cx="39" cy="50" r="5" fill="#3A3350"/><circle cx="61" cy="50" r="5" fill="#3A3350"/><circle cx="40.6" cy="48.4" r="1.6" fill="#FFF"/><circle cx="62.6" cy="48.4" r="1.6" fill="#FFF"/><ellipse cx="50" cy="66" rx="13" ry="10" fill="#F5DFB8"/><ellipse cx="50" cy="62" rx="5" ry="3.6" fill="#3A3350"/><path d="M50 66 v5 m0 0 q-5 4 -9 0 m9 0 q5 4 9 0" stroke="#8A6A38" stroke-width="2" fill="none" stroke-linecap="round"/>'
+};
+
+function hexA(hex, a) {
+  var h = hex.replace('#', '');
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  var n = parseInt(h, 16);
+  return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+}
+
+function renderStage() {
+  var s = state.story;
+  var i = state.lineIndex;
+  var scIdx = sceneIndexOfLine(i);
+  var sc = s.scenes[scIdx] || s.scenes[0];
+  var cur = s.script[i];
+  var figures = '';
+  var drawn = {};
+  s.script.forEach(function (ln, j) {
+    if (sceneIndexOfLine(j) !== scIdx) return;
+    if (drawn[ln.who]) return;   // 同一幕同一角色只画一次
+    drawn[ln.who] = true;
+    figures += sceneFigure(ln.who, j, ln.who === cur.who);
+  });
+  $('stage').innerHTML =
+    '<svg class="bg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="100" height="100" fill="' + sc.bg[0] + '"/>' +
+    '<rect y="30" width="100" height="70" fill="' + sc.bg[1] + '" opacity=".6"/>' +
+    '<ellipse cx="50" cy="99" rx="72" ry="13" fill="#FFFFFF" opacity=".38"/>' +
+    '</svg>' +
+    '<div class="caption">' + sc.cap + '</div>' +
+    figures +
+    '<div class="tap-hint">点气泡听这句 🔊</div>';
+  /* 气泡绑定：点一下重听，点两下跳到这句 */
+  $('stage').querySelectorAll('.fig-bub').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      playLine(Number(b.dataset.idx), true);
+    });
   });
 }
 
-/* 单句朗读：高亮 + 角色音色 + 场景联动 */
+/* 把整篇剧本摊成"人物 + 台词"纵向列表（预读用，气泡形式，不撒谎） */
+function renderLines() {
+  var c = $('lineList');
+  var s = state.story;
+  var html = '';
+  var lastSc = -1;
+  s.script.forEach(function (ln, i) {
+    var scIdx = sceneIndexOfLine(i);
+    if (scIdx !== lastSc) {
+      lastSc = scIdx;
+      html += '<div class="sc-divider">第 ' + (scIdx + 1) + ' 幕</div>';
+    }
+    html += bubbleHTML(i);
+  });
+  c.innerHTML = html;
+  bindBubbles(c);
+}
+
+function bubbleHTML(i) {
+  var ln = state.story.script[i];
+  var ch = CHARACTERS[ln.who] || CHARACTERS.nah;
+  var t = TONES[ln.tone] || TONES.normal;
+  return '<div class="line ' + (ln.who === 'gerald' || (state.story.cast[0] === ln.who) ? 'left' : 'right') +
+    '" data-index="' + i + '" style="--line-accent:' + ch.accent + ';--line-glow:' + hexA(ch.accent, .3) + '">' +
+    '<div class="avatar" title="' + ch.name + '">' + ch.em + '</div>' +
+    '<div class="bub">' +
+    '<div class="bub-top"><span class="who">' + ch.name + '</span>' +
+    (t.label ? '<span class="tone" style="background:' + hexA(ch.accent, .16) + ';color:' + ch.accent + '">' + t.label + '</span>' : '') +
+    '<span class="spk">🔊</span></div>' +
+    '<div class="en">' + ln.en + '</div>' +
+    '<div class="cn">' + ln.cn + '</div>' +
+    '</div></div>';
+}
+
+function bindBubbles(root) {
+  root.querySelectorAll('.line').forEach(function (el) {
+    el.addEventListener('click', function () { playLine(Number(el.dataset.index), true); });
+  });
+}
+
+/* 单句朗读：气泡高亮 + 角色音色 + 情绪 + 场景联动 */
 function playLine(i, manual) {
   var ln = state.story.script[i];
   if (!ln) return;
+  if (manual) { state.playingAll = false; }
   state.lineIndex = i;
   document.querySelectorAll('.line').forEach(function (el) {
     el.classList.toggle('speaking', Number(el.dataset.index) === i);
   });
   renderStage();
-  if (manual) { state.playingAll = false; }
+  var scEl = document.querySelector('.line[data-index="' + i + '"]');
+  if (scEl && manual) { try { scEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {} }
   speak(ln.en, ln.who, {
+    tone: ln.tone,
     onEnd: function () {
       if (state.playingAll) {
         var next = i + 1;
         if (next < state.story.script.length) {
-          setTimeout(function () { if (state.playingAll) playLine(next, false); }, 320);
+          setTimeout(function () { if (state.playingAll) playLine(next, false); }, 420);
         } else {
           state.playingAll = false;
           document.querySelectorAll('.line').forEach(function (el) { el.classList.remove('speaking'); });
@@ -728,8 +1030,7 @@ function playAll() {
 }
 
 function stopAll() {
-  state.playingAll = false;
-  try { if (synth) synth.cancel(); } catch (e) {}
+  stopSpeak();
   document.querySelectorAll('.line').forEach(function (el) { el.classList.remove('speaking'); });
 }
 

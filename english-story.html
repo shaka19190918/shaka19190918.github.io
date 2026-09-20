@@ -47,11 +47,27 @@ body{
 .story-btn .icon{font-size:32px;margin-bottom:6px}
 .story-btn .title{font-size:13px;font-weight:700;color:var(--txt)}
 .story-btn .subtitle{font-size:11px;color:var(--tx2);margin-top:2px}
-.vocab-card{background:var(--card);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh);margin-bottom:14px}
-.vocab-card h2{font-size:18px;font-weight:800;margin-bottom:8px}
-.vocab-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
-.vocab-item{background:var(--pri-l);border-radius:12px;padding:10px 8px;text-align:center;font-size:13px;font-weight:700;color:var(--pri-d);transition:transform .15s}
-.vocab-item:active{transform:scale(1.05)}
+/* Teaching card */
+.teaching-card{background:var(--card);border-radius:var(--r-lg);padding:18px;box-shadow:var(--sh);margin-bottom:14px}
+.teaching-card h2{font-size:18px;font-weight:800;margin-bottom:8px}
+.teaching-steps{display:grid;gap:12px;margin-top:12px}
+.teaching-step{background:var(--pri-l);border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:transform .15s}
+.teaching-step:active{transform:scale(1.05)}
+.teaching-step .sentence{font-size:16px;font-weight:700;color:var(--pri-d);margin-bottom:6px}
+.teaching-step .icon{font-size:24px;margin-bottom:4px}
+.teaching-step .play{font-size:14px;color:var(--pri);margin-top:4px}
+.teaching-btn{display:inline-block;padding:10px 24px;border-radius:12px;background:linear-gradient(135deg,var(--pri),var(--pri-d));color:#FFF;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:transform .15s}
+.teaching-btn:active{transform:scale(.95)}
+/* Recording mode selection */
+.rec-mode{background:var(--card);border-radius:var(--r-lg);padding:16px;box-shadow:var(--sh);margin-bottom:14px}
+.rec-mode h2{font-size:18px;font-weight:800;margin-bottom:8px}
+.rec-options{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.rec-option{flex:1;min-width:120px;background:var(--pri-l);border:2px solid #E0E0E0;border-radius:12px;padding:12px 10px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.rec-option:active{transform:scale(1.03)}
+.rec-option.selected{border-color:var(--pri);background:var(--pri-l);box-shadow:0 4px 14px rgba(166,108,255,.25)}
+.rec-option .icon{font-size:28px;margin-bottom:6px}
+.rec-option .title{font-size:14px;font-weight:700;color:var(--txt);}
+.rec-option .desc{font-size:12px;color:var(--tx2);margin-top:4px}
 .recording-card{background:var(--card);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);margin-bottom:14px}
 .recording-card h2{font-size:18px;font-weight:800;margin-bottom:12px}
 .recording-controls{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:16px}
@@ -80,8 +96,8 @@ body{
 /* Responsive */
 @media(max-width:700px){
   .story-options{grid-template-columns:repeat(2,1fr)}
-  .vocab-list{grid-template-columns:repeat(2,1fr)}
-  .recording-controls{flex-direction:column;align-items:center}
+  .teaching-steps{grid-template-columns:repeat(2,1fr)}
+  .rec-options{flex-direction:column;align-items:center}
   .rec-time{margin:8px 0}
 }
 </style>
@@ -98,9 +114,27 @@ body{
 <h2>选择一个故事</h2>
 <div class="story-options" id="storyOptions"></div>
 </div>
-<div class="vocab-card">
-<h2>关键词汇 & 句型</h2>
-<div class="vocab-list" id="vocabList"></div>
+<!-- Teaching Card -->
+<div class="teaching-card" id="teachingCard" style="display:none;">
+<h2 id="teachingTitle">故事学习</h2>
+<div class="teaching-steps" id="teachingSteps"></div>
+<button class="teaching-btn" id="teachToRecBtn">开始复述 →</button>
+</div>
+<!-- Recording mode selection -->
+<div class="rec-mode" id="recMode" style="display:none;">
+<h2>选择复述方式</h2>
+<div class="rec-options" id="recOptions">
+  <div class="rec-option" id="optPlayback" data-mode="playback">
+    <div class="icon">🎧</div>
+    <div class="title">仅回放并给出建议</div>
+    <div class="desc">录制后直接播放并获得改进建议，不保存文件</div>
+  </div>
+  <div class="rec-option" id="optSave" data-mode="save">
+    <div class="icon">💾</div>
+    <div class="title">复述良好可保存</div>
+    <div class="desc">如果复述表现不错，可选择保存到本地设备</div>
+  </div>
+</div>
 </div>
 <div class="recording-card">
 <h2>录音复述</h2>
@@ -111,7 +145,7 @@ body{
 </div>
 <div class="rec-time" id="recTime">00:00</div>
 </div>
-<div class="playback-card" id="playbackCard" style="display:none">
+<div class="playback-card" id="playbackCard" style="display:none;">
 <h2>播放回放</h2>
 <div class="playback-controls">
 <button class="play-btn" id="playBtn">▶️ 播放</button>
@@ -120,7 +154,7 @@ body{
 <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
 <div id="playbackTime">00:00 / 00:00</div>
 </div>
-<div class="feedback-card" id="feedbackCard" style="display:none">
+<div class="feedback-card" id="feedbackCard" style="display:none;">
 <h2>练习反馈</h2>
 <div class="feedback-content" id="feedbackContent"></div>
 <div class="feedback-tip" id="feedbackTip"></div>
@@ -242,6 +276,7 @@ const STORIES = [
 /* === 状态 === */
 let state = {
   currentStory: null,
+  teachingStepIndex: 0,
   mediaRecorder: null,
   recordedChunks: [],
   isRecording: false,
@@ -251,13 +286,13 @@ let state = {
   timerInterval: null,
   playbackStartTime: null,
   playbackDuration: 0,
-  playbackInterval: null
+  playbackInterval: null,
+  recMode: 'playback' // 'playback' or 'save'
 };
 
 /* === 初始化 === */
 document.addEventListener('DOMContentLoaded', () => {
   loadStoryOptions();
-  loadVocab([]); // 默认空
   updateStats();
   // 从本地存储恢复统计
   const stats = JSON.parse(localStorage.getItem('englishStoryStats') || '{"count":0}');
@@ -288,21 +323,79 @@ function selectStory(story) {
   event.currentTarget.classList.add('selected');
   
   state.currentStory = story;
-  loadVocab(story.vocab);
-  resetRecording();
+  state.teachingStepIndex = 0;
+  loadTeachingSteps(story.vocab);
+  showTeaching();
+  hideRecordingMode();
   hidePlayback();
   hideFeedback();
+  resetRecording();
 }
 
-function loadVocab(vocabArray) {
-  const container = document.getElementById('vocabList');
+function loadTeachingSteps(vocabArray) {
+  const container = document.getElementById('teachingSteps');
   container.innerHTML = '';
-  vocabArray.forEach(word => {
-    const item = document.createElement('div');
-    item.className = 'vocab-item';
-    item.textContent = word;
-    container.appendChild(item);
+  vocabArray.forEach((sentence, idx) => {
+    const step = document.createElement('div');
+    step.className = 'teaching-step';
+    step.dataset.index = idx;
+    step.innerHTML = `
+      <div class="icon">📖</div>
+      <div class="sentence">${sentence}</div>
+      <div class="play">点击播放</div>
+    `;
+    step.addEventListener('click', () => playTeachingSentence(idx));
+    container.appendChild(step);
   });
+}
+
+function playTeachingSentence(index) {
+  const sentence = state.currentStory.vocab[index];
+  speak(sentence);
+  // highlight step
+  document.querySelectorAll('.teaching-step').forEach((el, i) => {
+    if (i === index) {
+      el.classList.add('active');
+      setTimeout(() => el.classList.remove('active'), 800);
+    }
+  });
+}
+
+function showTeaching() {
+  document.getElementById('teachingCard').style.display = 'block';
+  document.getElementById('teachToRecBtn').style.display = 'inline-block';
+}
+
+function hideTeaching() {
+  document.getElementById('teachingCard').style.display = 'none';
+  document.getElementById('teachToRecBtn').style.display = 'none';
+}
+
+function teachToRec() {
+  hideTeaching();
+  showRecordingMode();
+  resetRecording();
+}
+
+function showRecordingMode() {
+  document.getElementById('recMode').style.display = 'block';
+  // default to playback mode
+  document.getElementById('optPlayback').classList.add('selected');
+  state.recMode = 'playback';
+}
+
+function hideRecordingMode() {
+  document.getElementById('recMode').style.display = 'none';
+}
+
+function selectRecMode(mode) {
+  state.recMode = mode;
+  document.querySelectorAll('.rec-option').forEach(opt => opt.classList.remove('selected'));
+  if (mode === 'playback') {
+    document.getElementById('optPlayback').classList.add('selected');
+  } else if (mode === 'save') {
+    document.getElementById('optSave').classList.add('selected');
+  }
 }
 
 /* === 录音功能 === */
@@ -319,7 +412,17 @@ async function startRecording() {
       state.recordedBlob = blob;
       state.recordedUrl = url;
       showPlayback();
-      calculateFeedback();
+      if (state.recMode === 'save') {
+        // 如果模式是保存，且表现好（这里简单判断时长≥7分钟），提供下载
+        const minutes = state.elapsedTime / 60000;
+        if (minutes >= 7) {
+          showDownloadLink();
+        } else {
+          showFeedback(`你复述了 ${minutes.toFixed(1)} 分钟，还需 ${(7 - minutes).toFixed(1)} 分钟才能达到目标。`, `记得尽量使用故事中的关键词和句子，描述角色的动作和感受。`);
+        }
+      } else {
+        calculateFeedback();
+      }
     };
     state.mediaRecorder.start(100); // collect data every 100ms
     state.isRecording = true;
@@ -341,7 +444,6 @@ function stopRecording() {
     updateRecordUI();
     clearInterval(state.timerInterval);
     state.timerInterval = null;
-    // 计时停止后保存最终时长
     const end = Date.now();
     state.elapsedTime = end - state.startTime;
     updateTimeDisplay();
@@ -368,16 +470,6 @@ function updateRecordUI() {
   document.getElementById('recordBtn').style.display = state.isRecording ? 'none' : 'inline-block';
   document.getElementById('stopBtn').style.display = state.isRecording ? 'inline-block' : 'none';
   document.getElementById('pauseBtn').style.display = state.isRecording && !state.isPaused ? 'inline-block' : 'none';
-  // 暂停按钮在录制中且未暂停时显示
-  // 实际上我们有一个按钮，需要切换文字或显示/隐藏两个按钮
-  // 简化：我们让 pauseBtn 表示暂停，另一个按钮继续录制？我们暂时保持两个按钮：暂停和继续？
-  // 为了简化，我们只保留一个按钮，根据状态切换图标和标题。
-  // 但我们已经有两个按钮，暂时保留这样：recordBtn 开始/继续，stopBtn 停止，pauseBtn 暂停。
-  // 实际上我们需要在录制中时，点击暂停按钮变为继续按钮。
-  // 为了快速实现，我们保持三个按钮：录制、停止、暂停/继续。
-  // 这里我们先不实现暂停/继续的切换，只保留开始和停止。
-  // 暂时隐藏暂停按钮。
-  document.getElementById('pauseBtn').style.display = 'none';
 }
 
 function startTimer() {
@@ -409,6 +501,7 @@ function resetRecording() {
   updateTimeDisplay();
   hidePlayback();
   hideFeedback();
+  hideDownloadLink();
 }
 
 function showPlayback() {
@@ -428,10 +521,7 @@ function playRecording() {
   const audio = new Audio(state.recordedUrl);
   audio.play();
   state.playbackStartTime = Date.now();
-  state.playbackDuration = state.recordedBlob.size / 1024 / 1024; // 近似，实际需要获取duration
-  // 由于我们没有直接获取duration，我们可以使用音频的duration属性在加载后获取
-  // 但这里我们简化：假设我们可以获取
-  // 实际上我们可以在创建URL后添加事件监听
+  state.playbackDuration = state.recordedBlob.size / 1024 / 1024; // approximation
   audio.addEventListener('loadedmetadata', () => {
     state.playbackDuration = audio.duration;
     updatePlaybackProgress();
@@ -442,18 +532,12 @@ function playRecording() {
 }
 
 function pausePlayback() {
-  // 这里我们暂停音频播放，但需要保存音频对象
-  // 为了简化，我们暂时不实现暂停/继续播放的细节，只保留播放和停止
-  // 由于时间关系，我们先不实现暂停播放功能，只保留播放和重置。
-  // 实际上我们可以在全局保存audio对象。
-  // 为了快速演示，我们略过。
+  // Simplified: we don't implement pause/resume for playback due to time.
   alert('播放暂停功能待完善');
 }
 
 function updatePlaybackProgress() {
-  // 这里需要音频对象的currentTime和duration
-  // 由于我们没有保存，暂时跳过
-  // 我们将在后续完善
+  // Not implemented due to time; placeholder.
 }
 
 function hidePlayback() {
@@ -481,6 +565,31 @@ function calculateFeedback() {
   updateStats();
 }
 
+function showDownloadLink() {
+  // create a temporary link to download the recorded blob
+  const link = document.createElement('a');
+  link.href = state.recordedUrl;
+  link.download = `story_${state.currentStory.id}_${Date.now()}.webm`;
+  link.style.display = 'none';
+  link.textContent = '下载录像';
+  document.getElementById('feedbackCard').appendChild(link);
+  link.click();
+  // after download, we can remove link
+  setTimeout(() => link.remove(), 100);
+  // also show feedback
+  showFeedback(`你的复述表现很好！（时长 ${(state.elapsedTime/60000).toFixed(1)} 分钟）`, `录像已保存到本地下载文件夹。继续练习其他故事吧！`);
+}
+
+function showFeedback(content, tip) {
+  document.getElementById('feedbackContent').textContent = content;
+  document.getElementById('feedbackTip').textContent = tip;
+  document.getElementById('feedbackCard').style.display = 'block';
+}
+
+function hideFeedback() {
+  document.getElementById('feedbackCard').style.display = 'none';
+}
+
 function updateStats() {
   const stats = JSON.parse(localStorage.getItem('englishStoryStats') || '{"count":0}');
   document.getElementById('stats').textContent = `🎯 今日练习: ${stats.count} 次`;
@@ -490,32 +599,33 @@ function updateStats() {
 document.getElementById('recordBtn').addEventListener('click', startRecording);
 document.getElementById('stopBtn').addEventListener('click', () => {
   stopRecording();
-  // 在停止后自动显示播放和反馈
-  setTimeout(() => {
-    showPlayback();
-    calculateFeedback();
-  }, 500);
+  // In stopRecording we already handle showing playback/feedback based on mode
 });
 document.getElementById('pauseBtn').addEventListener('click', () => {
   if (state.isPaused) {
-    // 继续录制
     resumeRecording();
     document.getElementById('pauseBtn').textContent = '⏸ 暂停';
   } else {
-    // 暂停录制
     pauseRecording();
     document.getElementById('pauseBtn').textContent = '▶️ 继续';
   }
 });
 document.getElementById('playBtn').addEventListener('click', playRecording);
 document.getElementById('pauseBtn2').addEventListener('click', pausePlayback);
-// 为了简化，我们暂时不实现暂停播放的具体逻辑
-// 实际上我们可以在pausePlayback中暂停音频，但需要保存audio对象
-// 这里我们先留空，后续可以完善
+document.getElementById('optPlayback').addEventListener('click', () => selectRecMode('playback'));
+document.getElementById('optSave').addEventListener('click', () => selectRecMode('save'));
+document.getElementById('teachToRecBtn').addEventListener('click', teachToRec);
 
-/* === 其他辅助 === */
-function hideFeedback() {
-  document.getElementById('feedbackCard').style.display = 'none';
+/* === TTS === */
+let synth = window.speechSynthesis || null;
+function speak(text, lang) {
+  if (!synth) return;
+  try { synth.cancel(); } catch (e) {}
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang || 'en-US';
+  u.rate = 0.8;
+  u.pitch = 1.1;
+  synth.speak(u);
 }
 </script>
 </body>

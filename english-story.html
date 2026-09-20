@@ -64,39 +64,82 @@ body{
 .cast-card .cvoice{font-size:10px;color:#6B6380;margin-top:2px;font-style:italic}
 
 /* 舞台 / 插图 */
-.stage{position:relative;border-radius:22px;overflow:hidden;background:var(--scene-bg,#EAF2FF);margin-bottom:14px;
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.6);min-height:320px;cursor:pointer}
-.stage svg.bg{display:block;width:100%;height:auto;position:absolute;inset:0;height:100%;object-fit:cover}
-.stage .caption{position:absolute;left:0;right:0;top:0;background:linear-gradient(to bottom,rgba(30,20,50,.55),rgba(30,20,50,0));
-  color:#FFF;font-size:12.5px;font-weight:700;padding:10px 14px 20px;text-shadow:0 1px 3px rgba(0,0,0,.4);z-index:3}
-.stage .tap-hint{position:absolute;right:10px;bottom:8px;font-size:11px;font-weight:700;color:#5B5170;
-  background:rgba(255,255,255,.82);padding:3px 9px;border-radius:10px;z-index:3}
+.stage{position:relative;border-radius:22px;overflow:hidden;margin-bottom:14px;
+  background:var(--scene-bg,#EAF2FF);min-height:280px}
+.stage svg.scene-bg{display:block;width:100%;height:100%;position:absolute;inset:0}
+.stage .caption{position:absolute;left:0;right:0;top:0;z-index:4;
+  background:linear-gradient(to bottom,rgba(28,18,48,.6),rgba(28,18,48,0));
+  color:#FFF;font-size:12.5px;font-weight:700;padding:9px 14px 18px;
+  text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.stage .tap-hint{position:absolute;right:10px;bottom:9px;z-index:4;font-size:11px;font-weight:700;
+  color:#4C4463;background:rgba(255,255,255,.88);padding:3px 10px;border-radius:11px;
+  box-shadow:0 2px 8px rgba(70,45,120,.12)}
 
-/* 场景人物 + 贴身旁白（漫画分镜） */
-.stage .figure{position:absolute;transform:translate(-50%,-50%);z-index:2;
-  display:flex;flex-direction:column;align-items:center;gap:5px}
-.stage .figure .art{width:var(--fw,92px);height:var(--fw,92px);pointer-events:none;
-  filter:drop-shadow(0 6px 10px rgba(40,25,70,.18))}
-.stage .figure .art svg{width:100%;height:100%;display:block}
-.stage .figure .art.inv svg{transform:scaleX(-1)}
-.stage .fig-bub{position:relative;max-width:150px;background:#FFF;border-radius:14px;padding:8px 11px;
-  box-shadow:0 6px 18px rgba(70,45,120,.18);border:2.5px solid var(--c-accent,#A66CFF);
-  cursor:pointer;transition:transform .16s,box-shadow .16s}
-.stage .fig-bub::after{content:'';position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
-  width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
-  border-top:9px solid var(--c-accent,#A66CFF)}
-.stage .fig-bub::before{content:'';position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
-  width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid #FFF;z-index:1}
-.stage .fig-bub:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 10px 24px rgba(70,45,120,.26)}
-.stage .fig-bub:active{transform:scale(.96)}
-.stage .fig-name{font-size:9.5px;font-weight:800;color:var(--c-accent,#A66CFF);letter-spacing:.4px;
-  text-transform:uppercase;margin-bottom:1px}
-.stage .fig-en{font-size:13px;font-weight:800;line-height:1.28;color:#2B2440}
-.stage .fig-cn{font-size:10.5px;color:#7B7392;margin-top:3px;line-height:1.3}
-.stage .figure.active .art{animation:bob .85s ease-in-out infinite}
-.stage .figure.active .fig-bub{box-shadow:0 0 0 4px var(--c-glow,rgba(166,108,255,.42)),0 8px 22px rgba(70,45,120,.24);transform:translateY(-3px)}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-@media (prefers-reduced-motion:reduce){.stage .figure.active .art{animation:none}}
+/* 两个固定卡位：左槽 / 右槽，永不重叠 */
+.stage .actor{position:absolute;bottom:12px;z-index:2;width:31%;
+  display:flex;flex-direction:column;align-items:center}
+.stage .actor.slot-l{left:2%}
+.stage .actor.slot-r{right:2%}
+.stage .actor .art{width:100%;max-width:118px;aspect-ratio:1;
+  filter:drop-shadow(0 7px 12px rgba(40,25,70,.22))}
+.stage .actor .art svg{width:100%;height:100%;display:block}
+.stage .actor.mirror .art svg{transform:scaleX(-1)}
+.stage .actor .tag{margin-top:5px;font-size:11px;font-weight:800;color:#FFF;
+  padding:2px 11px;border-radius:11px;letter-spacing:.4px;white-space:nowrap;
+  box-shadow:0 3px 9px rgba(40,25,70,.24)}
+.stage .actor.talking .art{animation:bob .9s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media (prefers-reduced-motion:reduce){.stage .actor.talking .art{animation:none}}
+
+/* 气泡：只出现在正在说话的角色头顶，空间独占，绝不叠字 */
+.stage .say{position:absolute;z-index:3;top:38px;width:46%;max-width:290px;
+  background:#FFF;border-radius:15px;padding:9px 12px 10px;
+  border:3px solid var(--c-accent,#A66CFF);
+  box-shadow:0 8px 22px rgba(70,45,120,.22);cursor:pointer;
+  transition:transform .16s,box-shadow .16s}
+.stage .say:hover{transform:scale(1.03);box-shadow:0 12px 28px rgba(70,45,120,.3)}
+.stage .say:active{transform:scale(.97)}
+.stage .say.bub-l{left:2%}
+.stage .say.bub-r{right:2%}
+.stage .say::after{content:'';position:absolute;bottom:-12px;width:0;height:0;
+  border-left:9px solid transparent;border-right:9px solid transparent;
+  border-top:12px solid var(--c-accent,#A66CFF)}
+.stage .say::before{content:'';position:absolute;bottom:-7px;width:0;height:0;z-index:1;
+  border-left:7px solid transparent;border-right:7px solid transparent;
+  border-top:9px solid #FFF}
+.stage .say.bub-l::after,.stage .say.bub-l::before{left:26%}
+.stage .say.bub-r::after,.stage .say.bub-r::before{right:26%}
+.stage .say .hdr{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.stage .say .nm{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.stage .say .tn{font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:8px}
+.stage .say .en{font-size:15px;font-weight:800;color:#2B2440;line-height:1.3}
+.stage .say .cn{font-size:11px;color:#7B7392;margin-top:3px;line-height:1.35}
+
+/* 静止态：没人在说话时，两个角色都安静站着 */
+.stage .quiet-tip{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:3;
+  font-size:12px;font-weight:700;color:#5B5170;background:rgba(255,255,255,.9);
+  padding:5px 14px;border-radius:14px;box-shadow:0 3px 10px rgba(70,45,120,.14)}
+
+/* 当前台词大卡（场景下方，永远是当前这一句，不再让孩子找） */
+.now-card{background:linear-gradient(135deg,var(--nc-bg,#F1E9FF),#FFF);
+  border-radius:20px;padding:14px 16px;margin-bottom:14px;border:2.5px solid var(--nc-accent,#A66CFF);
+  box-shadow:0 8px 22px rgba(94,70,150,.12)}
+.now-card .nc-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.now-card .nc-av{width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:#FFF;font-size:18px;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 3px 8px rgba(94,70,150,.15)}
+.now-card .nc-nm{font-size:13px;font-weight:800;letter-spacing:.3px}
+.now-card .nc-tn{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:9px}
+.now-card .nc-idx{margin-left:auto;font-size:11px;color:var(--tx2);font-weight:700}
+.now-card .nc-en{font-size:19px;font-weight:800;color:var(--txt);line-height:1.3}
+.now-card .nc-cn{font-size:13px;color:var(--tx2);margin-top:4px}
+.now-card .nc-actions{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}
+.now-card .nc-btn{flex:1;min-width:96px;padding:9px 12px;border-radius:12px;border:none;cursor:pointer;
+  font-family:inherit;font-size:13px;font-weight:800;background:#FFF;color:var(--tx);
+  box-shadow:0 3px 10px rgba(94,70,150,.12);transition:transform .14s}
+.now-card .nc-btn:hover{transform:translateY(-2px)}
+.now-card .nc-btn:active{transform:scale(.96)}
+.now-card .nc-btn.main{background:linear-gradient(135deg,var(--pri),var(--pri-d));color:#FFF}
+.now-card .nc-btn[disabled]{opacity:.4;pointer-events:none}
 
 /* 台词：人物 + 贴身旁白（纵向剧本流） */
 .sc-divider{margin:16px 0 10px;font-size:12px;font-weight:800;color:var(--tx2);letter-spacing:1.5px;
@@ -244,6 +287,7 @@ video#preview{width:100%;max-width:420px;border-radius:16px;background:#241E33;m
 
   <div class="cast-row" id="castRow"></div>
   <div class="stage" id="stage"></div>
+  <div class="now-card" id="nowCard"></div>
 
   <div class="btn-row" style="margin-top:0;margin-bottom:12px">
     <button class="btn primary small" id="playAllBtn">▶ 全篇朗读</button>
@@ -876,36 +920,34 @@ function flashCard(el) {
   setTimeout(function () { el.style.boxShadow = ''; }, 700);
 }
 
-/* 场景人物布局：每个角色站在固定位置上，头顶挂自己的话 */
-function sceneFigure(whoKey, lineIdx, bob) {
-  var ch = CHARACTERS[whoKey] || CHARACTERS.nah;
-  var n = state.story.script.length;
-  var sceneIdx = sceneIndexOfLine(lineIdx);
-  var place = (ch.pos && ch.pos[sceneIdx]) || [50, 52];
-  var art = FIG[whoKey] || ART.piggieL;
-  var inv = false;
-  /* 左半边的人物面朝右，右半边面朝左，看起来像在对话 */
-  if (place[0] > 52) inv = true;
-  var flip = '';
-  return '<div class="figure' + (bob ? ' active' : '') + '" style="left:' + place[0] + '%;top:' + place[1] +
-    '%;--c-accent:' + ch.accent + ';--c-glow:' + hexA(ch.accent, .34) + '">' +
-    '<div class="fig-bub" data-idx="' + lineIdx + '" style="border-color:' + ch.accent +
-    ';--c-accent:' + ch.accent + '">' +
-    '<div class="fig-name" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.em + '</div>' +
-    '<div class="fig-en">' + state.story.script[lineIdx].en + '</div>' +
-    '<div class="fig-cn">' + state.story.script[lineIdx].cn + '</div>' +
-    '</div>' +
-    '<div class="art"><span class="' + (inv ? '' : '') + '">' +
-    '<svg viewBox="0 0 100 100">' + art + '</svg></span></div>' +
-    '<div class="fig-name" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.em + '</div>' +
-    '</div>';
+/* =========================================================
+   场景人物布局：左右两个固定卡位，永不超过 2 人同框
+   —— 这是上一版最大的错：3 个角色 + 3 个气泡挤在一张图里，字全糊在一起。
+   现在改成"对话镜头"，谁说话谁出气泡，位置互斥，绝不重叠。
+   ========================================================= */
+function speakerSlot(whoKey) {
+  var order = (state.story.cast || []).indexOf(whoKey);
+  if (order < 0) order = whoKey === 'gerald' ? 0 : 1;
+  return order % 2 === 0 ? 'l' : 'r';
 }
 
-/* 台词 → 所属分幕 */
-function sceneIndexOfLine(lineIdx) {
-  var n = state.story.script.length;
-  var sc = state.story.scenes.length;
-  return Math.min(sc - 1, Math.floor(lineIdx / n * sc));
+/* 上镜的两个人必须分居左右两个卡位，否则会重叠。
+   3 人同幕的绘本（如 Can I Play Too?）里主角都是 左/左 或 右/右，
+   所以这里强制"说话人站自己惯用位，另一个人站对面"。 */
+function stagePair(talking) {
+  var s = state.story;
+  var scIdx = sceneIndexOfLine(state.lineIndex);
+  var cnt = {};
+  s.script.forEach(function (ln, j) {
+    if (sceneIndexOfLine(j) !== scIdx) return;
+    cnt[ln.who] = (cnt[ln.who] || 0) + 1;
+  });
+  var others = Object.keys(cnt).filter(function (w) { return w !== talking; })
+    .sort(function (a, b) { return (cnt[b] || 0) - (cnt[a] || 0); });
+  var pair = {};
+  pair[talking] = speakerSlot(talking);
+  if (others.length) pair[others[0]] = pair[talking] === 'l' ? 'r' : 'l';
+  return pair;
 }
 
 /* 角色专属立绘（去掉外层 svg 包装，供场景内复用） */
@@ -916,11 +958,54 @@ var FIG = {
   puppy: '<ellipse cx="50" cy="55" rx="31" ry="30" fill="#E8C48A"/><ellipse cx="22" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(-14 22 40)"/><ellipse cx="78" cy="40" rx="12" ry="20" fill="#C9A066" transform="rotate(14 78 40)"/><circle cx="39" cy="50" r="5" fill="#3A3350"/><circle cx="61" cy="50" r="5" fill="#3A3350"/><circle cx="40.6" cy="48.4" r="1.6" fill="#FFF"/><circle cx="62.6" cy="48.4" r="1.6" fill="#FFF"/><ellipse cx="50" cy="66" rx="13" ry="10" fill="#F5DFB8"/><ellipse cx="50" cy="62" rx="5" ry="3.6" fill="#3A3350"/><path d="M50 66 v5 m0 0 q-5 4 -9 0 m9 0 q5 4 9 0" stroke="#8A6A38" stroke-width="2" fill="none" stroke-linecap="round"/>'
 };
 
+/* #RGB/#RRGGBB → rgba()，用于气泡描边与光晕 */
 function hexA(hex, a) {
-  var h = hex.replace('#', '');
+  var h = String(hex).replace('#', '');
   if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
   var n = parseInt(h, 16);
+  if (isNaN(n)) return 'rgba(166,108,255,' + a + ')';
   return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+}
+
+/* 台词 → 所属分幕 */
+function sceneIndexOfLine(lineIdx) {
+  var n = state.story.script.length;
+  var sc = state.story.scenes.length;
+  return Math.min(sc - 1, Math.floor(lineIdx / n * sc));
+}
+
+/* 当前台词大卡：不管屏幕多小，永远清楚显示"谁 + 说了什么 + 什么语气" */
+function renderNowCard() {
+  var s = state.story;
+  if (!s) return;
+  var i = state.lineIndex;
+  var ln = s.script[i];
+  if (!ln) return;
+  var ch = CHARACTERS[ln.who] || CHARACTERS.nah;
+  var t = TONES[ln.tone] || TONES.normal;
+  var el = $('nowCard');
+  if (!el) return;
+  el.style.setProperty('--nc-accent', ch.accent);
+  el.style.setProperty('--nc-bg', ch.bg);
+  el.innerHTML =
+    '<div class="nc-top">' +
+    '<div class="nc-av">' + ch.em + '</div>' +
+    '<span class="nc-nm" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.cn + '</span>' +
+    (t.label ? '<span class="nc-tn" style="background:' + hexA(ch.accent, .17) + ';color:' + ch.accent + '">' + t.label + '</span>' : '') +
+    '<span class="nc-idx">第 ' + (i + 1) + ' / ' + s.script.length + ' 句</span>' +
+    '</div>' +
+    '<div class="nc-en">' + ln.en + '</div>' +
+    '<div class="nc-cn">' + ln.cn + '</div>' +
+    '<div class="nc-actions">' +
+    '<button class="nc-btn" id="ncPrev"' + (i === 0 ? ' disabled' : '') + '>← 上一句</button>' +
+    '<button class="nc-btn main" id="ncReplay">🔊 再听一遍</button>' +
+    '<button class="nc-btn" id="ncNext"' + (i === s.script.length - 1 ? ' disabled' : '') + '>下一句 →</button>' +
+    '</div>';
+  $('ncPrev').addEventListener('click', function () { if (i > 0) playLine(i - 1, true); });
+  $('ncReplay').addEventListener('click', function () { playLine(i, true); });
+  $('ncNext').addEventListener('click', function () {
+    if (i < s.script.length - 1) playLine(i + 1, true);
+  });
 }
 
 function renderStage() {
@@ -929,30 +1014,53 @@ function renderStage() {
   var scIdx = sceneIndexOfLine(i);
   var sc = s.scenes[scIdx] || s.scenes[0];
   var cur = s.script[i];
-  var figures = '';
-  var drawn = {};
-  s.script.forEach(function (ln, j) {
-    if (sceneIndexOfLine(j) !== scIdx) return;
-    if (drawn[ln.who]) return;   // 同一幕同一角色只画一次
-    drawn[ln.who] = true;
-    figures += sceneFigure(ln.who, j, ln.who === cur.who);
-  });
+  var talking = cur.who;
+
+  /* 上镜名单：说话人 + 一个在场配角，两人强制分居左右卡位，绝不重叠 */
+  var pair = stagePair(talking);
+  var who = Object.keys(pair);
+  /* 说话人排前，保证 DOM 顺序稳定 */
+  who.sort(function (a, b) { return (a === talking ? -1 : 0) - (b === talking ? -1 : 0); });
+
+  function actorHTML(w) {
+    var ch = CHARACTERS[w];
+    var slot = pair[w] || 'l';
+    var isTalking = w === talking;
+    return '<div class="actor slot-' + slot + (slot === 'r' ? ' mirror' : '') + (isTalking ? ' talking' : '') + '">' +
+      '<div class="art"><svg viewBox="0 0 100 100">' + (FIG[w] || FIG.piggie) + '</svg></div>' +
+      '<div class="tag" style="background:' + ch.accent + '">' + ch.name + ' ' + ch.em + '</div>' +
+      '</div>';
+  }
+
+  var ch = CHARACTERS[talking] || CHARACTERS.nah;
+  var t = TONES[cur.tone] || TONES.normal;
+  var slot = pair[talking] || 'l';
+  var bubble = '<div class="say bub-' + slot + '" data-idx="' + i + '" style="--c-accent:' + ch.accent + '">' +
+    '<div class="hdr">' +
+    '<span class="nm" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.em + '</span>' +
+    (t.label ? '<span class="tn" style="background:' + hexA(ch.accent, .17) + ';color:' + ch.accent + '">' + t.label + '</span>' : '') +
+    '</div>' +
+    '<div class="en">' + cur.en + '</div>' +
+    '<div class="cn">' + cur.cn + '</div>' +
+    '</div>';
+
   $('stage').innerHTML =
-    '<svg class="bg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">' +
+    '<svg class="scene-bg" viewBox="0 0 100 100" preserveAspectRatio="none">' +
     '<rect width="100" height="100" fill="' + sc.bg[0] + '"/>' +
-    '<rect y="30" width="100" height="70" fill="' + sc.bg[1] + '" opacity=".6"/>' +
-    '<ellipse cx="50" cy="99" rx="72" ry="13" fill="#FFFFFF" opacity=".38"/>' +
+    '<rect y="34" width="100" height="66" fill="' + sc.bg[1] + '" opacity=".55"/>' +
+    '<ellipse cx="50" cy="101" rx="74" ry="12" fill="#FFFFFF" opacity=".4"/>' +
     '</svg>' +
     '<div class="caption">' + sc.cap + '</div>' +
-    figures +
-    '<div class="tap-hint">点气泡听这句 🔊</div>';
-  /* 气泡绑定：点一下重听，点两下跳到这句 */
-  $('stage').querySelectorAll('.fig-bub').forEach(function (b) {
-    b.addEventListener('click', function (e) {
-      e.stopPropagation();
-      playLine(Number(b.dataset.idx), true);
-    });
-  });
+    who.map(actorHTML).join('') +
+    bubble +
+    '<div class="tap-hint" id="stageTap" data-idx="' + i + '">🔊 再听一遍</div>';
+
+  var bub = $('stage').querySelector('.say');
+  if (bub) bub.addEventListener('click', function (e) { e.stopPropagation(); playLine(i, true); });
+  var tap = $('stageTap');
+  if (tap) tap.addEventListener('click', function (e) { e.stopPropagation(); playLine(i, true); });
+
+  renderNowCard();
 }
 
 /* 把整篇剧本摊成"人物 + 台词"纵向列表（预读用，气泡形式，不撒谎） */
@@ -977,11 +1085,13 @@ function bubbleHTML(i) {
   var ln = state.story.script[i];
   var ch = CHARACTERS[ln.who] || CHARACTERS.nah;
   var t = TONES[ln.tone] || TONES.normal;
-  return '<div class="line ' + (ln.who === 'gerald' || (state.story.cast[0] === ln.who) ? 'left' : 'right') +
+  var slot = speakerSlot(ln.who);
+  return '<div class="line ' + (slot === 'l' ? 'left' : 'right') +
     '" data-index="' + i + '" style="--line-accent:' + ch.accent + ';--line-glow:' + hexA(ch.accent, .3) + '">' +
     '<div class="avatar" title="' + ch.name + '">' + ch.em + '</div>' +
     '<div class="bub">' +
-    '<div class="bub-top"><span class="who">' + ch.name + '</span>' +
+    '<div class="bub-top">' +
+    '<span class="who" style="color:' + ch.accent + '">' + ch.name + ' ' + ch.cn + '</span>' +
     (t.label ? '<span class="tone" style="background:' + hexA(ch.accent, .16) + ';color:' + ch.accent + '">' + t.label + '</span>' : '') +
     '<span class="spk">🔊</span></div>' +
     '<div class="en">' + ln.en + '</div>' +

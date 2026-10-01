@@ -36,3 +36,28 @@ body.kid-speaking .stage .actor.talking .art{animation:bob 1s ease-in-out infini
 @media(max-width:760px){#app{padding:0 16px 24px;gap:16px}.kid-head{padding:14px 0;gap:8px}.kid-brand{font-size:17px}.kid-count{font-size:12px}.kid-hero{padding:24px;grid-template-columns:1fr 110px;gap:8px}.kid-hero .hero-art{width:110px}.kid-hero p{font-size:16px}.kid-books{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.kid-cover{height:120px}.kid-cover svg{height:105px}.kid-book{padding:8px 8px 16px}.kid-book h3{font-size:18px}.kid-reader-layout{grid-template-columns:1fr}.kid-reader-layout .stage{min-height:270px}.stage .actor .art{max-width:125px}.kid-text{padding:20px}.kid-reader-head h1{font-size:21px}.kid-controls{gap:8px}.kid-controls .kid-btn{padding:12px 4px;font-size:16px}.kid-task{padding:20px}.kid-choices{grid-template-columns:1fr}.kid-choice{display:flex;gap:10px;align-items:center}.kid-choice>button:first-child{min-height:64px;display:flex;align-items:center;gap:12px;text-align:left}.kid-choice .emoji{font-size:34px}.kid-choice .kid-btn{width:80px;flex:none}.kid-help{margin-top:24px}}
 @media(max-width:360px){.kid-hero{grid-template-columns:1fr;padding:22px}.kid-hero .hero-art{display:none}.kid-head{flex-wrap:wrap}.kid-books{gap:12px}.kid-cover{height:105px}.kid-book p{font-size:14px}.kid-book h3{margin-left:2px;margin-right:2px}.kid-reader-head{align-items:flex-start;gap:10px}.kid-reader-head .kid-btn{padding:10px}.kid-tools .kid-btn{padding:12px}.stage .say{top:95px}.stage .caption{font-size:15px}}
 @media(prefers-reduced-motion:reduce){body.kid-speaking .stage .actor.talking .art{animation:none!important}.kid-btn{transition:none}}
+
+/* Original plush picture-book characters, shared by every story. */
+.picture-cover{position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:10px 8px}
+.picture-sprite{display:block;flex:0 1 50%;aspect-ratio:1;background-image:url('assets/story-v2/characters.webp');background-size:400% 200%;background-repeat:no-repeat}
+.picture-sprite.pig{background-position:0 0}.picture-sprite.elephant{background-position:0 100%}
+.picture-sprite.pose-1{background-position-x:33.33333%}.picture-sprite.pose-2{background-position-x:66.66667%}.picture-sprite.pose-3{background-position-x:100%}
+.picture-prop{position:absolute;bottom:6%;left:42%;font-size:30px;filter:drop-shadow(0 3px 0 white)}
+.hero-art{height:170px}.kid-cover>.picture-cover{padding-top:18px}.kid-cover .picture-cover i{position:static}
+.kid-book:first-child .kid-cover{background:linear-gradient(135deg,#d4f4ec,#fff0bc)}
+.kid-reader-layout{grid-template-columns:1fr}.kid-reader-layout .stage{min-height:0;aspect-ratio:16/9}
+.kid-reader-layout .stage{aspect-ratio:auto}.stage canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}.kid-text{padding:22px 28px}
+.theater-card{padding:24px;background:#fff;border:2px solid #e8dff0;border-radius:32px;box-shadow:0 7px 0 #e9e2ef}
+.theater-top{display:flex;gap:12px;justify-content:space-between;color:#67537b;font-size:17px;font-weight:800;margin-bottom:16px}
+.theater-screen{border:4px solid #fff3ce;border-radius:26px;overflow:hidden;background:#e6f4ed;box-shadow:0 5px 0 #eadcc0}
+.theater-screen canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}.theater-screen canvas:fullscreen{background:#e6f4ed;width:100vw;height:100vh;object-fit:contain}
+.theater-script{margin-top:24px;padding:22px;background:#f5f0ff;border-radius:24px}.theater-script .kid-speaker{margin-bottom:8px}
+.theater-script details{margin-top:14px;font-size:18px;color:#67537b}.theater-script summary{cursor:pointer;min-height:48px;padding:10px 0}.theater-script details p{font-size:20px}
+.theater-steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.theater-steps span{background:#fff0ca;padding:12px 16px;border-radius:18px;font-size:17px;font-weight:750}
+.theater-toggle{display:flex;gap:12px;align-items:center;font-size:17px;min-height:52px}.theater-toggle input{width:24px;height:24px;flex:none}
+.theater-meter{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:22px 0 14px;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}.theater-meter meter{width:140px;height:22px}
+.theater-privacy{font-size:15px;color:#766585;line-height:1.7;margin-top:14px}.theater-fallback{margin-top:24px;padding-top:16px;border-top:2px dashed #e8dff0}.theater-fallback summary{min-height:48px;cursor:pointer;color:#67537b;padding:12px 0}
+#theaterResult{padding:22px;background:#eaf7ed;border-radius:24px;margin-top:24px}#theaterResult h2{font-size:24px;margin-bottom:10px}#theaterPlayback{display:block;width:100%;aspect-ratio:16/9;background:#254545;border-radius:20px;margin-top:18px}
+@media(max-width:760px){.kid-reader-layout .stage{min-height:0}.theater-card{padding:14px}.theater-top{font-size:15px}.theater-script{padding:18px}.theater-card .kid-actions{gap:10px}.theater-card .kid-btn{flex:1 1 auto}.hero-art{height:115px}.picture-prop{font-size:24px}#theaterResult{padding:14px}}
+.theater-recording #theaterStart{display:none}
+@media(max-width:760px){.theater-recording .theater-record-controls{position:fixed;bottom:0;left:0;right:0;z-index:20;padding:12px 16px calc(14px + env(safe-area-inset-bottom));background:#fffaf2f5;border-top:2px solid #e9dff0;box-shadow:0 -4px 16px #58407018;display:grid;grid-template-columns:1fr 1fr}.theater-recording #theaterNext{grid-column:1/-1;grid-row:1}.theater-recording .theater-card{padding-bottom:150px}}

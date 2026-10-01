@@ -17,10 +17,12 @@ with sync_playwright() as p:
     ctx=b.new_context(accept_downloads=True);ctx.add_init_script(MOCK)
     page=ctx.new_page();page.set_default_timeout(10000);errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
     page.goto(BASE,wait_until='networkidle');page.wait_for_function('window.StoryChild')
-    assert page.locator('.kid-book').count()==6
+    assert page.locator('.kid-book').count()==7
     assert page.evaluate('spoken.length')==0
     print('Ready: shelf',flush=True)
     def action(name):
+        if name=="open":
+            page.locator('.kid-book[data-id="can-i-play-too"]').click();return
         page.locator('[data-action="'+name+'"]').filter(visible=True).first.click()
     action('open');assert page.locator('.kid-translation').is_hidden()
     action('listen');assert page.evaluate('lastUtterance.text')=='Let us play catch!'
@@ -48,7 +50,7 @@ with sync_playwright() as p:
     page.wait_for_timeout(8200);action('quiz');page.locator('[data-action="answer"][data-index="1"]').click()
     assert page.evaluate("StoryChild.progress.books['can-i-play-too'].complete")
     print('PASS quiz and listening completion',flush=True)
-    action('retell');action('record');assert page.evaluate('mediaCalls.length')==0
+    action('retell');page.locator('.theater-fallback summary').click();action('free-retell');action('record');assert page.evaluate('mediaCalls.length')==0
     page.locator('#kidConsent').check();action('record');page.wait_for_function('mediaCalls.length===1');assert page.evaluate('mediaCalls[0].video') is False
     action('stoprecord');page.wait_for_selector('#kidDownload:visible');assert page.evaluate('tracksStopped')==1
     assert '不作自动评分' in page.locator('#kidRecordStatus').inner_text()
@@ -65,7 +67,7 @@ with sync_playwright() as p:
         page.set_viewport_size({'width':w,'height':h});page.locator('#kidBack').click()
         assert page.evaluate('document.documentElement.scrollWidth<=innerWidth+1')
         if w in [390,1440]:page.screenshot(path=f'.visual-story/shelf-{w}.png',full_page=True)
-        for i in range(6):
+        for i in range(7):
             page.locator('.kid-book').nth(i).click()
             length=page.evaluate('state.story.script.length')
             for line in range(length):
@@ -77,5 +79,5 @@ with sync_playwright() as p:
             action('shelf')
         action('open')
     assert not errors,errors
-    print('PASS 6 books/all sentences at 7 viewport sizes, speech stop/error/no voice, translation, resume, real completion, quiz intervention, mic consent/cancel, download MIME, no page errors')
+    print('PASS 7 books/all sentences at 7 viewport sizes, speech stop/error/no voice, translation, resume, real completion, quiz intervention, mic consent/cancel, download MIME, no page errors')
     b.close()

@@ -9,9 +9,9 @@ MOCK=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assig
 with sync_playwright() as p:
     b=p.chromium.launch(headless=True,executable_path=str(CHROME),args=['--no-proxy-server'])
     ctx=b.new_context();ctx.add_init_script(MOCK);page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
-    page.clock.install();page.goto(BASE,wait_until='networkidle');page.locator('[data-action="open"]').first.click()
+    page.clock.install();page.goto(BASE,wait_until='networkidle');page.locator('.kid-book[data-id="can-i-play-too"]').click()
     assert page.locator('#kidRate').input_value()=='0.85'
-    page.locator('[data-action="retell"]').click();page.locator('#kidConsent').check()
+    page.locator('[data-action="retell"]').click();page.locator('.theater-fallback summary').click();page.locator('[data-action="free-retell"]').click();page.locator('#kidConsent').check()
     page.evaluate("navigator.mediaDevices.getUserMedia=async()=>{throw new DOMException('denied','NotAllowedError')};void 0")
     page.locator('[data-action="record"]').click();page.wait_for_function("document.querySelector('#kidRecordStatus').textContent.includes('未能开启')")
     assert page.locator('#kidRecord').is_enabled()

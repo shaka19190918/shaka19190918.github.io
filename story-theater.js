@@ -3,11 +3,11 @@
 (()=>{
  'use strict';
  const el=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- let story=null,index=0,epoch=0,pending=false,pendingContext=null,session=null,frame=0,result=null,resultUrl=null,downloaded=false,demoEpoch=0,demoAudio=null,demoActive=false,demoTimer=null;
+ let story=null,index=0,epoch=0,pending=false,pendingContext=null,session=null,frame=0,result=null,resultUrl=null,downloaded=false,demoEpoch=0,demoAudio=null,demoActive=false,demoSpeaking=false,demoFrame=0,demoTimer=null;
  const MAX_MS=180000,SILENCE_MS=1200;
  function button(a,t,primary=false){return `<button class="kid-btn ${primary?'primary':''}" type="button" data-theater="${a}">${t}</button>`}
  function note(t){if(el('theaterStatus'))el('theaterStatus').textContent=t}
- function clearDemo(){demoEpoch++;clearTimeout(demoTimer);demoAudio?.pause();demoAudio=null;demoActive=false;try{speechSynthesis.cancel()}catch(_){}}
+ function clearDemo(){demoEpoch++;clearTimeout(demoTimer);demoAudio?.pause();demoAudio=null;demoActive=false;setDemoSpeaking(false);try{speechSynthesis.cancel()}catch(_){}}
  function supported(){return !!(window.MediaRecorder&&window.AudioContext&&HTMLCanvasElement.prototype.captureStream&&navigator.mediaDevices?.getUserMedia)}
  function ui(){
   if(!el('theaterStart'))return;const recording=!!session,pause=recording&&session.rec.state==='paused';
@@ -18,6 +18,7 @@
   el('theaterClock').textContent=recording?fmt(Math.max(0,(MAX_MS-(performance.now()-session.started))/1000)):'最多 3 分钟';
  }
  function paint(speaking=false,t=0){const c=el('theaterCanvas');if(c&&story)StoryPicture.draw(c.getContext('2d'),story,index,{speaking,t})}
+ function setDemoSpeaking(on){demoSpeaking=on;cancelAnimationFrame(demoFrame);paint(on,performance.now()/1000);if(on&&!session){let last=0;const animate=now=>{if(!demoSpeaking||session||document.hidden)return;if(now-last>=66){paint(true,now/1000);last=now}demoFrame=requestAnimationFrame(animate)};demoFrame=requestAnimationFrame(animate)}}
  function line(){const l=story.script[index],ch=CHARACTERS[l.who];el('theaterSpeaker').textContent=ch.em+' '+ch.cn+' · '+ch.name;el('theaterLine').textContent=l.en;el('theaterCn').textContent=l.cn;el('theaterLineCount').textContent=`第 ${index+1} / ${story.script.length} 句`;paint()}
  function mount(s){halt('已停止本次录制。');story=s;index=0;
   el('kid-retell').innerHTML=`<div class="kid-reader-head"><button class="kid-btn" data-action="reader">← 回到故事</button><div><span class="kid-eyebrow">小猪小象 · 配音小剧场</span><h1>${esc(s.cn)}</h1></div></div><section class="theater-card"><div class="theater-top"><span>🎬 你来演两个角色</span><span id="theaterLineCount"></span></div><div class="theater-screen"><canvas id="theaterCanvas" width="1280" height="720" role="img" aria-label="当前角色和故事画面"></canvas></div><div class="theater-script"><p id="theaterSpeaker" class="kid-speaker"></p><p id="theaterLine" class="kid-sentence" lang="en"></p><details><summary>看中文</summary><p id="theaterCn"></p></details></div><div class="kid-actions">${button('demo','🔊 先听这句')} ${button('fullscreen','⛶ 放大画面')}</div><div class="theater-steps"><span>① 看角色</span><span>② 念这一句</span><span>③ 停顿换幕</span></div><label class="kid-consent"><input id="theaterConsent" type="checkbox">家长同意本次麦克风与本地视频制作</label><label class="theater-toggle"><input id="theaterAuto" type="checkbox" checked>说话后停顿约1秒，自动下一句</label><div class="kid-actions">${button('start','🎙️ 开始我的配音',true)}${button('pause','⏸ 暂停')}${button('next','这句念好了 →')}${button('stop','■ 完成 / 取消')}</div><div class="theater-meter"><span id="theaterClock">最多 3 分钟</span><meter id="theaterMeter" min="0" max="1" value="0" aria-label="麦克风声音大小"></meter></div><p id="theaterStatus" class="kid-status" role="status" aria-live="polite">先听示范，再用自己的声音扮演角色。不需要模仿特殊口音。</p><p class="theater-privacy">只检测声音与停顿，不识别句子、不评判发音。不打开摄像头、不上传。请在安静环境中练习；背景声也可能触发换幕，可关闭自动模式。</p><section id="theaterResult" hidden></section><details class="theater-fallback"><summary>只想自由讲一段故事？</summary><p>不看台词，自己讲给家长听。</p><button class="kid-btn" data-action="free-retell">🎤 自由讲述（仅录音）</button></details></section>`;
@@ -40,7 +41,7 @@
    if(el('theaterMeter'))el('theaterMeter').value=Math.min(1,rms*9);
    if(s.auto&&s.voiceMs>=350&&s.silentMs>=SILENCE_MS&&now-s.lineStarted>1700)advance();
   }else{s.last=now;s.speaking=false}
-  if(session===s&&!s.finishing){if(now-s.painted>66){paint(s.speaking,(now-s.started)/1000);s.painted=now}frame=requestAnimationFrame(tick)}
+  if(session===s&&!s.finishing){if(now-s.painted>66){paint(demoSpeaking||s.speaking,(now-s.started)/1000);s.painted=now}frame=requestAnimationFrame(tick)}
  }
  async function start(){
   if(pending||session||document.hidden||!el('kidRest').hidden)return;
@@ -67,10 +68,10 @@
   if(pending||session?.finishing)return;clearDemo();el('theaterPlayback')?.pause();const token=demoEpoch,l=story.script[index];const s=session,resume=!!s&&s.rec.state==='recording';
   if(resume){s.rec.pause();s.input.getAudioTracks().forEach(t=>t.enabled=false);ui()}
   demoActive=true;ui();note('正在听示范，录制已暂停，麦克风静音。听完再轮到你。');
-  const ended=()=>{if(token!==demoEpoch)return;clearTimeout(demoTimer);demoAudio?.pause();demoAudio=null;demoActive=false;if(resume&&session===s&&!s.finishing){s.input.getAudioTracks().forEach(t=>t.enabled=true);s.rec.resume();resetVad(s)}ui();note('轮到你说啦！')};
+  const ended=()=>{if(token!==demoEpoch)return;clearTimeout(demoTimer);demoAudio?.pause();demoAudio=null;demoActive=false;setDemoSpeaking(false);if(resume&&session===s&&!s.finishing){s.input.getAudioTracks().forEach(t=>t.enabled=true);s.rec.resume();resetVad(s)}ui();note('轮到你说啦！')};
   demoTimer=setTimeout(()=>{try{speechSynthesis.cancel()}catch(_){}ended();note('示范已停止，可以再听一次或继续配音。')},25000);
-  if(story.original){const a=new Audio(`assets/story-v2/voice/fly-${String(index+1).padStart(2,'0')}.mp3`);demoAudio=a;a.onended=ended;a.onerror=()=>{ended();note('示范音频没有加载成功，请联网后重试或请家长陪读。')};a.play().catch(a.onerror)}
-  else{const voices=window.speechSynthesis?.getVoices()?.filter(v=>/^en(?:[-_]|$)/i.test(v.lang))||[];if(!voices.length){ended();note('设备没有英语语音，请开启英语语音或请家长示范。');return}const u=new SpeechSynthesisUtterance(l.en);u.lang=voices[0].lang;u.voice=voices.find(v=>v.localService)||voices[0];u.rate=.85;u.pitch=1;u.onend=ended;u.onerror=ended;try{speechSynthesis.speak(u)}catch(_){ended()}}
+  if(story.original){const a=new Audio(`assets/story-v2/voice/fly-${String(index+1).padStart(2,'0')}.mp3`);demoAudio=a;a.onplaying=()=>{if(token===demoEpoch)setDemoSpeaking(true)};a.onwaiting=()=>{if(token===demoEpoch)setDemoSpeaking(false)};a.onended=ended;a.onerror=()=>{ended();note('示范音频没有加载成功，请联网后重试或请家长陪读。')};a.play().catch(a.onerror)}
+  else{const voices=window.speechSynthesis?.getVoices()?.filter(v=>/^en(?:[-_]|$)/i.test(v.lang))||[];if(!voices.length){ended();note('设备没有英语语音，请开启英语语音或请家长示范。');return}const u=new SpeechSynthesisUtterance(l.en);u.lang=voices[0].lang;u.voice=voices.find(v=>v.localService)||voices[0];u.rate=.85;u.pitch=1;u.onstart=()=>{if(token===demoEpoch)setDemoSpeaking(true)};u.onend=ended;u.onerror=ended;try{speechSynthesis.speak(u)}catch(_){ended()}}
  }
  async function download(){if(!result||!resultUrl)return;el('theaterPlayback')?.pause();const ext=result.mime.includes('mp4')?'mp4':'webm',name=`my-dialogue-${result.id}.${ext}`,file=new File([result.blob],name,{type:result.mime});
   try{if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:'我的英语配音小电影'});downloaded=true;note('已打开系统保存/分享，请确认保存位置。');return}}catch(e){if(e.name==='AbortError'){note('已取消保存，视频仍在此页面。');return}}

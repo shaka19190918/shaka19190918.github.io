@@ -6,7 +6,7 @@ import asyncio,json,subprocess
 from pathlib import Path
 import edge_tts
 
-js="""const fs=require('fs'),vm=require('vm');const c={Image:class{},window:{}};vm.createContext(c);vm.runInContext(fs.readFileSync('story-data.js','utf8'),c);vm.runInContext(fs.readFileSync('story-picture.js','utf8'),c);console.log(JSON.stringify(c.STORIES.find(s=>s.original).script));"""
+js="""const fs=require('fs'),vm=require('vm');const c={Image:class{},MutationObserver:class{observe(){}},document:{body:{},addEventListener(){}},window:{addEventListener(){}}};vm.createContext(c);vm.runInContext(fs.readFileSync('story-data.js','utf8'),c);vm.runInContext(fs.readFileSync('story-picture.js','utf8'),c);console.log(JSON.stringify(c.STORIES.find(s=>s.original).script));"""
 lines=json.loads(subprocess.check_output(['node','-e',js],text=True,encoding='utf8'))
 folder=Path('assets/story-v2/voice');folder.mkdir(parents=True,exist_ok=True)
 async def build():
